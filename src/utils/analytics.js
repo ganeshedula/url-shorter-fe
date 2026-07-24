@@ -1,15 +1,25 @@
-export function getDailyTrendPoints(dailyClicks = []) {
+export function getDailyTrendPoints(dailyClicks = [], padding = 16) {
   if (!dailyClicks.length) {
     return [];
   }
 
-  const maxValue = Math.max(...dailyClicks.map((item) => item.count), 1);
+  const values = dailyClicks.map((item) => item.count || 0);
+  const maxValue = Math.max(...values, 1);
+  const availableHeight = 100 - padding * 2;
 
-  return dailyClicks.map((item, index) => ({
-    ...item,
-    x: dailyClicks.length === 1 ? 0 : (index / (dailyClicks.length - 1)) * 100,
-    y: 100 - (item.count / maxValue) * 100,
-  }));
+  return dailyClicks.map((item, index) => {
+    const count = item.count || 0;
+    const x = dailyClicks.length === 1 ? 50 : (index / (dailyClicks.length - 1)) * 100;
+    const ratio = count / maxValue;
+    const y = (100 - padding) - ratio * availableHeight;
+
+    return {
+      ...item,
+      count,
+      x: Number(x.toFixed(2)),
+      y: Number(y.toFixed(2)),
+    };
+  });
 }
 
 export function groupByLabel(list = [], getLabel) {

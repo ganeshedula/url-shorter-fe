@@ -66,6 +66,22 @@ export default function AnalyticsPage() {
     () => toDistributionEntries(groupByLabel(analytics?.recentClicks, (item) => item.country)).slice(0, 5),
     [analytics]
   );
+  const formattedDailyClicks = useMemo(() => {
+    if (!analytics?.dailyClicks) return [];
+    if (Array.isArray(analytics.dailyClicks)) {
+      return analytics.dailyClicks.map((item) => ({
+        date: item.date || item.day || "Date",
+        count: item.count ?? item.clicks ?? 0,
+      }));
+    }
+    if (typeof analytics.dailyClicks === "object") {
+      return Object.entries(analytics.dailyClicks).map(([dateStr, count]) => ({
+        date: new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        count: Number(count) || 0,
+      }));
+    }
+    return [];
+  }, [analytics]);
 
   if (loading) {
     return (
@@ -143,7 +159,7 @@ export default function AnalyticsPage() {
               <h3 className="text-2xl">Clicks over time</h3>
               <p className="mt-2">Daily trend straight from the backend analytics payload.</p>
               <div className="mt-6">
-                <MiniLineChart data={analytics.dailyClicks} />
+                <MiniLineChart data={formattedDailyClicks} />
               </div>
             </Card>
           </div>

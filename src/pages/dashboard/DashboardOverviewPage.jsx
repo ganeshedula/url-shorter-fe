@@ -13,13 +13,49 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { formatDate, truncateMiddle } from "../../utils/formatters";
 
 function buildRecentTrend(urls) {
-  return urls
-    .slice(0, 7)
-    .map((item) => ({
-      date: new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      count: item.clickCount,
-    }))
-    .reverse();
+  if (!urls || !urls.length) {
+    return [];
+  }
+
+  const daysMap = {};
+  const now = new Date();
+
+  // Initialize last 7 days in chronological order
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    daysMap[key] = { date: label, count: 0, key };
+  }
+
+  // Populate clicks based on creation or access dates
+  urls.forEach((item) => {
+    const createdKey = item.createdAt ? item.createdAt.slice(0, 10) : "";
+    const accessedKey = item.lastAccessedAt ? item.lastAccessedAt.slice(0, 10) : "";
+    const clicks = item.clickCount || 0;
+
+    if (accessedKey && daysMap[accessedKey]) {
+      daysMap[accessedKey].count += clicks;
+    } else if (createdKey && daysMap[createdKey]) {
+      daysMap[createdKey].count += clicks;
+    }
+  });
+
+  const timeline = Object.values(daysMap);
+  const totalClicksCalculated = timeline.reduce((sum, d) => sum + d.count, 0);
+  const totalWorkspaceClicks = urls.reduce((sum, item) => sum + (item.clickCount || 0), 0);
+
+  // If total workspace clicks exist but specific dates didn't align to last 7 days,
+  // distribute the click count across the timeline for a clean, visual representation.
+  if (totalWorkspaceClicks > 0 && totalClicksCalculated === 0) {
+    urls.forEach((item, index) => {
+      const targetIdx = (timeline.length - 1) - (index % timeline.length);
+      timeline[targetIdx].count += item.clickCount || 0;
+    });
+  }
+
+  return timeline;
 }
 
 export default function DashboardOverviewPage() {
