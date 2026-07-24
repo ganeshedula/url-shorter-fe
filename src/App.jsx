@@ -67,8 +67,29 @@ export default function App() {
       <Toaster
         position="top-right"
         toastOptions={{
+          duration: 4000,
           className:
-            "!rounded-2xl !border !border-border !bg-surface !px-4 !py-3 !text-sm !font-medium !text-app shadow-soft",
+            "!rounded-2xl !border !border-slate-700/60 !bg-slate-900 !text-slate-50 dark:!bg-slate-900 dark:!text-slate-100 !px-4.5 !py-3.5 !text-sm !font-semibold shadow-2xl !z-[9999]",
+          success: {
+            duration: 4000,
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#ffffff",
+            },
+            style: {
+              borderLeft: "4px solid #10b981",
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: "#f43f5e",
+              secondary: "#ffffff",
+            },
+            style: {
+              borderLeft: "4px solid #f43f5e",
+            },
+          },
         }}
       />
     </>

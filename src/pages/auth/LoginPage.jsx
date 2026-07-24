@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
 import { Input } from "../../components/common/Input";
+import { Alert } from "../../components/common/Alert";
 import { usePageTitle } from "../../hooks/usePageTitle";
 
 const schema = z.object({
@@ -21,6 +23,8 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isBusy } = useAuth();
+  const [serverError, setServerError] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -31,11 +35,14 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values) => {
+    setServerError("");
     try {
       await login(values);
       navigate(location.state?.from || "/app/dashboard", { replace: true });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Invalid credentials.");
+      const errMsg = error.response?.data?.message || "Invalid credentials. Please check your email and password.";
+      setServerError(errMsg);
+      toast.error(errMsg);
     }
   };
 
@@ -63,6 +70,13 @@ export default function LoginPage() {
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Login</p>
           <h2 className="mt-3 text-3xl">Access your dashboard</h2>
         </div>
+        {serverError ? (
+          <div className="mb-5">
+            <Alert variant="danger" dismissible onClose={() => setServerError("")}>
+              {serverError}
+            </Alert>
+          </div>
+        ) : null}
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <Input
             id="login-email"
