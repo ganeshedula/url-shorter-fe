@@ -1,7 +1,6 @@
 import { FiBarChart2, FiCopy, FiEdit2, FiExternalLink, FiImage, FiTrash2 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { Badge } from "../common/Badge";
-import { Button } from "../common/Button";
 import { Tooltip } from "../common/Tooltip";
 import { formatDate, formatRelativeFromNow, truncateMiddle } from "../../utils/formatters";
 
@@ -10,8 +9,8 @@ export function UrlTable({ items, onCopy, onDelete, onEdit, onQr }) {
     <div className="overflow-hidden rounded-[28px] border border-border">
       <div className="overflow-x-auto">
         <table className="min-w-full">
-          <thead className="bg-surface-alt/50 text-left">
-            <tr className="text-xs uppercase tracking-[0.18em] text-muted">
+          <thead className="bg-surface-alt/60 text-left">
+            <tr className="text-xs uppercase tracking-[0.18em] text-muted font-semibold">
               <th className="px-5 py-4">Link</th>
               <th className="px-5 py-4">Status</th>
               <th className="px-5 py-4">Clicks</th>
@@ -20,62 +19,103 @@ export function UrlTable({ items, onCopy, onDelete, onEdit, onQr }) {
               <th className="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-t border-border">
-                <td className="px-5 py-5">
-                  <div className="space-y-2">
-                    <a
-                      href={item.shortUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-                    >
-                      {item.shortUrl}
-                      <FiExternalLink />
-                    </a>
-                    <p className="text-sm">{truncateMiddle(item.originalUrl)}</p>
-                  </div>
-                </td>
-                <td className="px-5 py-5">
-                  <Badge variant={item.active ? "success" : "danger"}>{item.active ? "Active" : "Inactive"}</Badge>
-                </td>
-                <td className="px-5 py-5 text-sm font-semibold text-text">{item.clickCount}</td>
-                <td className="px-5 py-5 text-sm">{formatRelativeFromNow(item.updatedAt)}</td>
-                <td className="px-5 py-5 text-sm">{formatDate(item.expirationDate)}</td>
-                <td className="px-5 py-5">
-                  <div className="flex justify-end gap-2">
-                    <Tooltip content="Copy URL">
-                      <Button variant="secondary" size="sm" className="w-10 px-0" onClick={() => onCopy(item.shortUrl)}>
-                        <FiCopy />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip content="Edit URL">
-                      <Button variant="secondary" size="sm" className="w-10 px-0" onClick={() => onEdit(item)}>
-                        <FiEdit2 />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip content="Generate QR">
-                      <Button variant="secondary" size="sm" className="w-10 px-0" onClick={() => onQr(item)}>
-                        <FiImage />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip content="View analytics">
-                      <Link to={`/app/analytics?id=${item.id}`}>
-                        <Button variant="secondary" size="sm" className="w-10 px-0">
-                          <FiBarChart2 />
-                        </Button>
-                      </Link>
-                    </Tooltip>
-                    <Tooltip content="Delete URL">
-                      <Button variant="danger" size="sm" className="w-10 px-0" onClick={() => onDelete(item)}>
-                        <FiTrash2 />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                </td>
-              </tr>
-            ))}
+          <tbody className="divide-y divide-border">
+            {items.map((item) => {
+              const updatedTimestamp = item.updatedAt || item.lastAccessedAt || item.createdAt;
+              return (
+                <tr key={item.id} className="transition-colors hover:bg-surface-alt/25">
+                  <td className="px-5 py-4">
+                    <div className="space-y-1.5">
+                      <a
+                        href={item.shortUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                      >
+                        {item.shortUrl}
+                        <FiExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                      <p className="text-sm font-medium text-text">{truncateMiddle(item.originalUrl)}</p>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <Badge variant={item.active ? "success" : "danger"}>
+                      {item.active ? "Active" : "Inactive"}
+                    </Badge>
+                  </td>
+                  <td className="px-5 py-4 text-sm font-bold text-text">{item.clickCount || 0}</td>
+                  <td className="px-5 py-4 text-sm font-medium text-text">
+                    {formatRelativeFromNow(updatedTimestamp)}
+                  </td>
+                  <td className="px-5 py-4 text-sm font-medium text-text">
+                    {item.expirationDate ? (
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                        {formatDate(item.expirationDate)}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium text-muted/70 italic">Never</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex justify-end gap-2.5">
+                      <Tooltip content="Copy URL">
+                        <button
+                          type="button"
+                          onClick={() => onCopy(item.shortUrl)}
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/25 active:scale-95 transition-all shadow-sm"
+                          aria-label="Copy URL"
+                        >
+                          <FiCopy className="h-4.5 w-4.5" />
+                        </button>
+                      </Tooltip>
+
+                      <Tooltip content="Edit URL">
+                        <button
+                          type="button"
+                          onClick={() => onEdit(item)}
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/25 active:scale-95 transition-all shadow-sm"
+                          aria-label="Edit URL"
+                        >
+                          <FiEdit2 className="h-4.5 w-4.5" />
+                        </button>
+                      </Tooltip>
+
+                      <Tooltip content="Generate QR">
+                        <button
+                          type="button"
+                          onClick={() => onQr(item)}
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/25 active:scale-95 transition-all shadow-sm"
+                          aria-label="Generate QR"
+                        >
+                          <FiImage className="h-4.5 w-4.5" />
+                        </button>
+                      </Tooltip>
+
+                      <Tooltip content="View analytics">
+                        <Link
+                          to={`/app/analytics?id=${item.id}`}
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 active:scale-95 transition-all shadow-sm"
+                          aria-label="View analytics"
+                        >
+                          <FiBarChart2 className="h-4.5 w-4.5" />
+                        </Link>
+                      </Tooltip>
+
+                      <Tooltip content="Delete URL">
+                        <button
+                          type="button"
+                          onClick={() => onDelete(item)}
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-red-500/40 bg-red-500 text-white hover:bg-red-600 active:scale-95 transition-all shadow-sm"
+                          aria-label="Delete URL"
+                        >
+                          <FiTrash2 className="h-4.5 w-4.5" />
+                        </button>
+                      </Tooltip>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

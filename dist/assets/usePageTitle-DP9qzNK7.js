@@ -1,0 +1,1 @@
+import{j as r,m as a,s as n,r as o}from"./index-DHBtOEpE.js";function i({className:e,children:s}){return r.jsx(a.div,{whileHover:{y:-2},transition:{duration:.2},className:n("glass-panel rounded-[28px] p-6",e),children:s})}function u(e){o.useEffect(()=>{document.title=e?`${e} | Nexly`:"Nexly URL Shortener"},[e])}export{i as C,u};

@@ -171,38 +171,55 @@ export default function AnalyticsPage() {
           </div>
 
           <Card>
-            <h3 className="text-2xl">Recent click events</h3>
-            <div className="mt-6 overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="text-left text-xs uppercase tracking-[0.2em] text-muted">
-                  <tr>
-                    <th className="pb-3">Time</th>
-                    <th className="pb-3">Browser</th>
-                    <th className="pb-3">OS</th>
-                    <th className="pb-3">Country</th>
-                    <th className="pb-3">IP</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analytics.recentClicks.length ? (
-                    analytics.recentClicks.map((item, index) => (
-                      <tr key={`${item.accessedAt}-${index}`} className="border-t border-border">
-                        <td className="py-4 text-sm">{formatDate(item.accessedAt, { includeTime: true })}</td>
-                        <td className="py-4 text-sm">{item.browser || "Unknown"}</td>
-                        <td className="py-4 text-sm">{item.operatingSystem || "Unknown"}</td>
-                        <td className="py-4 text-sm">{item.country || "Unknown"}</td>
-                        <td className="py-4 text-sm">{item.ipAddress || "Unknown"}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" className="py-8 text-center text-sm text-muted">
-                        No recent click events yet.
-                      </td>
+            <h3 className="text-2xl font-bold text-text">Recent click events</h3>
+            <p className="mt-1.5 text-sm text-muted">Detailed log of recent access attempts for the selected short link.</p>
+            <div className="mt-6 overflow-hidden rounded-[24px] border border-border">
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-surface-alt/60 text-left">
+                    <tr className="text-xs uppercase tracking-[0.18em] text-muted font-semibold">
+                      <th className="px-5 py-4">Time</th>
+                      <th className="px-5 py-4">Browser</th>
+                      <th className="px-5 py-4">OS</th>
+                      <th className="px-5 py-4">Country</th>
+                      <th className="px-5 py-4">IP Address</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {analytics.recentClicks && analytics.recentClicks.length ? (
+                      analytics.recentClicks.map((item, index) => {
+                        const clickTime = item.accessedAt || item.timestamp || item.createdAt || item.time;
+                        const browser = item.browser || item.browserName || "Unknown";
+                        const os = item.operatingSystem || item.os || item.osName || "Unknown";
+                        const country = item.country || item.countryCode || item.location || "Unknown";
+                        const ip = item.ipAddress || item.ip || item.clientIp || "Unknown";
+
+                        return (
+                          <tr key={`${clickTime}-${index}`} className="transition-colors hover:bg-surface-alt/25">
+                            <td className="px-5 py-4 text-sm font-medium text-text">
+                              {clickTime ? formatDate(clickTime, { includeTime: true }) : "Unknown time"}
+                            </td>
+                            <td className="px-5 py-4 text-sm font-semibold text-text">{browser}</td>
+                            <td className="px-5 py-4 text-sm font-medium text-text">{os}</td>
+                            <td className="px-5 py-4 text-sm font-medium text-text">
+                              <span className="inline-flex items-center gap-1.5 rounded-lg bg-surface-alt/80 px-2.5 py-1 text-xs font-semibold text-text border border-border">
+                                {country}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-sm font-mono text-muted">{ip}</td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="py-10 text-center text-sm font-medium text-muted">
+                          No recent click events recorded for this URL yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Card>
         </>

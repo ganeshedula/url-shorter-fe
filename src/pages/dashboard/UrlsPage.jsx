@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FiFilter } from "react-icons/fi";
+import { FiCheck, FiFilter } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useOutletContext } from "react-router-dom";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
@@ -17,6 +17,7 @@ import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useUrlLibrary } from "../../hooks/useUrlLibrary";
 import { urlService } from "../../services/urlService";
+import { cn } from "../../utils/cn";
 
 export default function UrlsPage() {
   usePageTitle("My URLs");
@@ -111,6 +112,12 @@ export default function UrlsPage() {
     return <ErrorState description="We couldn't load your URL library." onRetry={refresh} />;
   }
 
+  const filterLabelMap = {
+    all: "All links",
+    active: "Active only",
+    inactive: "Inactive only",
+  };
+
   return (
     <div className="space-y-4">
       <Breadcrumb items={[{ label: "Workspace" }, { label: "My URLs" }]} />
@@ -123,15 +130,42 @@ export default function UrlsPage() {
             <p className="mt-2">Search, sort, update, copy, analyze, and remove links without touching backend contracts.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Dropdown label={<span className="inline-flex items-center gap-2"><FiFilter /> Filters</span>}>
-              <button className="block w-full rounded-xl px-3 py-2 text-left text-sm font-medium hover:bg-primary/10" onClick={() => setStatusFilter("all")}>
-                All links
+            <Dropdown
+              label={
+                <span className="inline-flex items-center gap-2 font-semibold text-text">
+                  <FiFilter className="text-primary" /> Filter: {filterLabelMap[statusFilter]}
+                </span>
+              }
+            >
+              <button
+                className={cn(
+                  "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold transition-colors",
+                  statusFilter === "all" ? "bg-primary text-white" : "text-slate-100 hover:bg-slate-800"
+                )}
+                onClick={() => setStatusFilter("all")}
+              >
+                <span>All links</span>
+                {statusFilter === "all" ? <FiCheck className="text-white" /> : null}
               </button>
-              <button className="block w-full rounded-xl px-3 py-2 text-left text-sm font-medium hover:bg-primary/10" onClick={() => setStatusFilter("active")}>
-                Active only
+              <button
+                className={cn(
+                  "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold transition-colors",
+                  statusFilter === "active" ? "bg-primary text-white" : "text-slate-100 hover:bg-slate-800"
+                )}
+                onClick={() => setStatusFilter("active")}
+              >
+                <span>Active only</span>
+                {statusFilter === "active" ? <FiCheck className="text-white" /> : null}
               </button>
-              <button className="block w-full rounded-xl px-3 py-2 text-left text-sm font-medium hover:bg-primary/10" onClick={() => setStatusFilter("inactive")}>
-                Inactive only
+              <button
+                className={cn(
+                  "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold transition-colors",
+                  statusFilter === "inactive" ? "bg-primary text-white" : "text-slate-100 hover:bg-slate-800"
+                )}
+                onClick={() => setStatusFilter("inactive")}
+              >
+                <span>Inactive only</span>
+                {statusFilter === "inactive" ? <FiCheck className="text-white" /> : null}
               </button>
             </Dropdown>
             <Button variant="secondary" onClick={() => setDirection((current) => (current === "desc" ? "asc" : "desc"))}>
