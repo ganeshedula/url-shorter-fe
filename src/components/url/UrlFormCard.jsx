@@ -81,6 +81,7 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
           id={`${mode}-expiration`}
           label="Expiration"
           value={expirationDateValue}
+          placement={mode === "edit" ? "top" : "auto"}
           onChange={(newVal) =>
             setValue("expirationDate", newVal, { shouldValidate: true, shouldDirty: true })
           }

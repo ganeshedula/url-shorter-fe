@@ -11,8 +11,18 @@ import {
 } from "react-icons/fi";
 import { cn } from "../../utils/cn";
 
-export function DateTimePicker({ id, label, value, onChange, error, hint, className }) {
+export function DateTimePicker({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  hint,
+  className,
+  placement = "auto",
+}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [effectivePlacement, setEffectivePlacement] = useState(placement === "auto" ? "bottom" : placement);
   const containerRef = useRef(null);
 
   // Parse current value or default to now
@@ -49,6 +59,24 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
       setAmpm(validDate.getHours() >= 12 ? "PM" : "AM");
     }
   }, [value]);
+
+  // Smart placement calculation (top vs bottom)
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      if (placement === "auto") {
+        const rect = containerRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        // If space below is less than 350px and there's space above, open upwards
+        if (spaceBelow < 350 && rect.top > 280) {
+          setEffectivePlacement("top");
+        } else {
+          setEffectivePlacement("bottom");
+        }
+      } else {
+        setEffectivePlacement(placement);
+      }
+    }
+  }, [isOpen, placement]);
 
   // Click outside to close
   useEffect(() => {
@@ -316,11 +344,14 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
         {isOpen ? (
           <motion.div
             key="calendar-popover"
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            initial={{ opacity: 0, y: effectivePlacement === "top" ? -8 : 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.96 }}
+            exit={{ opacity: 0, y: effectivePlacement === "top" ? -6 : 6, scale: 0.96 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute left-0 right-0 sm:left-auto sm:right-0 top-full mt-2 z-[100] w-full sm:w-[350px] rounded-3xl border border-border bg-slate-900/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-100 ring-1 ring-white/10 select-none"
+            className={cn(
+              "absolute left-0 right-0 sm:left-auto sm:right-0 z-[100] w-full sm:w-[350px] max-h-[75vh] overflow-y-auto rounded-3xl border border-border bg-slate-900/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-100 ring-1 ring-white/10 select-none",
+              effectivePlacement === "top" ? "bottom-full mb-2" : "top-full mt-2"
+            )}
           >
             {/* Presets Header */}
             <div className="mb-3 space-y-1.5 border-b border-border/60 pb-2.5">
