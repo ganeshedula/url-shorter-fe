@@ -243,9 +243,18 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
       ) : null}
 
       <div
+        id={id}
+        role="button"
+        tabIndex={0}
         onClick={handleToggle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsOpen((prev) => !prev);
+          }
+        }}
         className={cn(
-          "glass-panel flex min-h-12 cursor-pointer items-center justify-between gap-3 rounded-2xl px-4 transition-all duration-200 select-none",
+          "glass-panel flex min-h-12 cursor-pointer items-center justify-between gap-3 rounded-2xl px-4 transition-all duration-200 select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
           error
             ? "!border-red-500/80 ring-2 ring-red-500/20 bg-red-500/5"
             : isOpen
@@ -254,9 +263,9 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
           className
         )}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <FiCalendar className={cn("shrink-0 text-base transition-colors", validDate ? "text-primary" : "text-muted")} />
-          <span className={cn("text-sm font-medium truncate", validDate ? "text-text font-semibold" : "text-muted/80")}>
+        <div className="flex flex-1 items-center gap-3 min-w-0">
+          <FiCalendar className={cn("shrink-0 text-base transition-colors", validDate ? "text-primary" : "text-slate-400")} />
+          <span className={cn("text-sm font-medium truncate", validDate ? "text-text font-semibold" : "text-slate-400 dark:text-slate-300")}>
             {getDisplayText()}
           </span>
         </div>
