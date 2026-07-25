@@ -132,9 +132,11 @@ export default function UrlsPage() {
   return (
     <div className="space-y-4">
       <Breadcrumb items={[{ label: "Workspace" }, { label: "My URLs" }]} />
-      <UrlFormCard onSubmit={handleCreate} loading={saving} />
+      <div className="relative z-20">
+        <UrlFormCard onSubmit={handleCreate} loading={saving} />
+      </div>
 
-      <Card>
+      <Card className="relative z-10">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-2xl">Managed links</h2>

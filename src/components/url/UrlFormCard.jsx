@@ -58,7 +58,7 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
   };
 
   return (
-    <Card>
+    <Card className={mode === "create" ? "relative z-20" : ""}>
       <div className="mb-6">
         <h3 className="text-xl">{mode === "create" ? "Create new short link" : "Edit link"}</h3>
         <p className="mt-2">Stay aligned with the backend schema: URL plus optional expiration date.</p>

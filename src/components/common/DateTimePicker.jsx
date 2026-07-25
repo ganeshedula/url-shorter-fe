@@ -13,6 +13,7 @@ import { cn } from "../../utils/cn";
 
 export function DateTimePicker({ id, label, value, onChange, error, hint, className }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropPosition, setDropPosition] = useState("bottom");
   const containerRef = useRef(null);
 
   // Parse current value or default to now
@@ -49,6 +50,22 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
       setAmpm(validDate.getHours() >= 12 ? "PM" : "AM");
     }
   }, [value]);
+
+  // Auto detect smart drop placement (top vs bottom)
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      // Popover compact height is approx 330px
+      if (spaceBelow < 340 && spaceAbove > 320) {
+        setDropPosition("top");
+      } else {
+        setDropPosition("bottom");
+      }
+    }
+  }, [isOpen]);
 
   // Click outside to close
   useEffect(() => {
@@ -301,15 +318,18 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
       <AnimatePresence>
         {isOpen ? (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            initial={{ opacity: 0, y: dropPosition === "top" ? -8 : 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.96 }}
+            exit={{ opacity: 0, y: dropPosition === "top" ? -6 : 6, scale: 0.96 }}
             transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute left-0 right-0 sm:left-auto sm:right-0 top-full z-50 mt-2 w-full sm:w-[360px] rounded-3xl border border-border bg-slate-900/95 p-4 shadow-2xl backdrop-blur-2xl text-slate-100 ring-1 ring-white/10"
+            className={cn(
+              "absolute left-0 right-0 sm:left-auto sm:right-0 z-[100] w-full sm:w-[350px] max-h-[85vh] overflow-y-auto rounded-3xl border border-border bg-slate-900/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-100 ring-1 ring-white/10",
+              dropPosition === "top" ? "bottom-full mb-2" : "top-full mt-2"
+            )}
           >
             {/* Presets Header */}
-            <div className="mb-4 space-y-1.5 border-b border-border/60 pb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Quick presets</span>
+            <div className="mb-3 space-y-1.5 border-b border-border/60 pb-2.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Quick presets</span>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: "Tomorrow", days: 1 },
@@ -330,34 +350,34 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
             </div>
 
             {/* Calendar Header Navigation */}
-            <div className="mb-3 flex items-center justify-between px-1">
-              <h4 className="text-sm font-bold text-slate-100">
+            <div className="mb-2.5 flex items-center justify-between px-1">
+              <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wide">
                 {monthNames[viewMonth]} {viewYear}
               </h4>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={handlePrevMonth}
-                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
+                  className="flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
                   aria-label="Previous Month"
                 >
-                  <FiChevronLeft className="h-4 w-4" />
+                  <FiChevronLeft className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={handleNextMonth}
-                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
+                  className="flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
                   aria-label="Next Month"
                 >
-                  <FiChevronRight className="h-4 w-4" />
+                  <FiChevronRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
             {/* Days of Week */}
-            <div className="mb-1.5 grid grid-cols-7 text-center">
+            <div className="mb-1 grid grid-cols-7 text-center">
               {daysOfWeek.map((day) => (
-                <span key={day} className="text-[11px] font-bold text-muted uppercase">
+                <span key={day} className="text-[10px] font-bold text-muted uppercase">
                   {day}
                 </span>
               ))}
@@ -375,7 +395,7 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
                     type="button"
                     onClick={() => handleSelectDay(dayObj)}
                     className={cn(
-                      "flex h-9 w-full items-center justify-center rounded-xl text-xs font-semibold transition-all relative",
+                      "flex h-8 w-full items-center justify-center rounded-xl text-xs font-semibold transition-all relative",
                       selected
                         ? "bg-primary text-white shadow-md shadow-primary/30 scale-105 font-bold z-10"
                         : dayObj.isCurrentMonth
@@ -391,15 +411,15 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
             </div>
 
             {/* Time Picker Bar */}
-            <div className="mt-4 pt-3 border-t border-border/60">
+            <div className="mt-3 pt-2.5 border-t border-border/60">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-muted">Time</span>
-                <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Time</span>
+                <div className="flex items-center gap-1.5">
                   {/* Hours */}
                   <select
                     value={hours12}
                     onChange={(e) => handleTimeChange(e.target.value, minutes, ampm)}
-                    className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary"
+                    className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary cursor-pointer"
                   >
                     {Array.from({ length: 12 }, (_, i) => {
                       const h = String(i + 1).padStart(2, "0");
@@ -411,7 +431,7 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
                   <select
                     value={minutes}
                     onChange={(e) => handleTimeChange(hours12, e.target.value, ampm)}
-                    className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary"
+                    className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary cursor-pointer"
                   >
                     {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map((m) => (
                       <option key={m} value={m} className="bg-slate-900 text-slate-100">{m}</option>
@@ -440,7 +460,7 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex items-center justify-between gap-2 border-t border-border/60 pt-3">
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
               <button
                 type="button"
                 onClick={() => {
