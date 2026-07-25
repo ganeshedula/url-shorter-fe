@@ -19,6 +19,8 @@ import { useUrlLibrary } from "../../hooks/useUrlLibrary";
 import { urlService } from "../../services/urlService";
 import { cn } from "../../utils/cn";
 
+import { isUrlExpired } from "../../utils/formatters";
+
 export default function UrlsPage() {
   usePageTitle("My URLs");
   const { globalSearch } = useOutletContext();
@@ -48,7 +50,16 @@ export default function UrlsPage() {
     if (statusFilter === "all") {
       return data.content;
     }
-    return data.content.filter((item) => (statusFilter === "active" ? item.active : !item.active));
+    return data.content.filter((item) => {
+      const expired = item.expirationDate && isUrlExpired(item.expirationDate);
+      if (statusFilter === "active") {
+        return item.active && !expired;
+      }
+      if (statusFilter === "inactive") {
+        return !item.active || expired;
+      }
+      return true;
+    });
   }, [data.content, statusFilter]);
 
   const refresh = () => fetchUrls(params).catch(() => {});
@@ -202,6 +213,7 @@ export default function UrlsPage() {
       >
         {editingUrl ? (
           <UrlFormCard
+            key={editingUrl.id}
             mode="edit"
             loading={saving}
             initialValues={{ url: editingUrl.originalUrl, expirationDate: editingUrl.expirationDate }}

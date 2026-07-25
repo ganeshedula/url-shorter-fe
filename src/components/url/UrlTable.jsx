@@ -2,7 +2,8 @@ import { FiBarChart2, FiCopy, FiEdit2, FiExternalLink, FiImage, FiTrash2 } from 
 import { Link } from "react-router-dom";
 import { Badge } from "../common/Badge";
 import { Tooltip } from "../common/Tooltip";
-import { formatDate, formatRelativeFromNow, truncateMiddle } from "../../utils/formatters";
+import { formatDate, formatRelativeFromNow, isUrlExpired } from "../../utils/formatters";
+import { cn } from "../../utils/cn";
 
 export function UrlTable({ items, onCopy, onDelete, onEdit, onQr }) {
   return (
@@ -22,9 +23,11 @@ export function UrlTable({ items, onCopy, onDelete, onEdit, onQr }) {
           <tbody className="divide-y divide-border">
             {items.map((item) => {
               const updatedTimestamp = item.updatedAt || item.lastAccessedAt || item.createdAt;
+              const expired = item.expirationDate && isUrlExpired(item.expirationDate);
+
               return (
                 <tr key={item.id} className="transition-colors hover:bg-surface-alt/25">
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-4 max-w-xs md:max-w-md">
                     <div className="space-y-1.5">
                       <a
                         href={item.shortUrl}
@@ -35,13 +38,22 @@ export function UrlTable({ items, onCopy, onDelete, onEdit, onQr }) {
                         {item.shortUrl}
                         <FiExternalLink className="h-3.5 w-3.5" />
                       </a>
-                      <p className="text-sm font-medium text-text">{truncateMiddle(item.originalUrl)}</p>
+                      <p
+                        className="text-sm font-medium text-text truncate max-w-sm md:max-w-lg"
+                        title={item.originalUrl}
+                      >
+                        {item.originalUrl}
+                      </p>
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <Badge variant={item.active ? "success" : "danger"}>
-                      {item.active ? "Active" : "Inactive"}
-                    </Badge>
+                    {expired ? (
+                      <Badge variant="danger">Expired</Badge>
+                    ) : (
+                      <Badge variant={item.active ? "success" : "danger"}>
+                        {item.active ? "Active" : "Inactive"}
+                      </Badge>
+                    )}
                   </td>
                   <td className="px-5 py-4 text-sm font-bold text-text">{item.clickCount || 0}</td>
                   <td className="px-5 py-4 text-sm font-medium text-text">
@@ -49,8 +61,15 @@ export function UrlTable({ items, onCopy, onDelete, onEdit, onQr }) {
                   </td>
                   <td className="px-5 py-4 text-sm font-medium text-text">
                     {item.expirationDate ? (
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300 border border-amber-500/20">
-                        {formatDate(item.expirationDate)}
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold border",
+                          expired
+                            ? "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                            : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20"
+                        )}
+                      >
+                        {expired ? "Expired: " : ""}{formatDate(item.expirationDate, { includeTime: true })}
                       </span>
                     ) : (
                       <span className="text-xs font-medium text-muted/70 italic">Never</span>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,6 +6,9 @@ import toast from "react-hot-toast";
 import { Button } from "../common/Button";
 import { Card } from "../common/Card";
 import { Input } from "../common/Input";
+import { DateTimePicker } from "../common/DateTimePicker";
+import { formatForDateTimeLocal } from "../../utils/formatters";
+import { cn } from "../../utils/cn";
 
 const schema = z.object({
   url: z.string().url("Enter a valid URL").refine((value) => /^https?:\/\//.test(value), {
@@ -18,24 +22,37 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       url: initialValues?.url || "",
-      expirationDate: initialValues?.expirationDate?.slice(0, 16) || "",
+      expirationDate: formatForDateTimeLocal(initialValues?.expirationDate),
     },
   });
+
+  const expirationDateValue = watch("expirationDate");
+
+  useEffect(() => {
+    reset({
+      url: initialValues?.url || "",
+      expirationDate: formatForDateTimeLocal(initialValues?.expirationDate),
+    });
+  }, [initialValues?.url, initialValues?.expirationDate, reset]);
 
   const submit = async (values) => {
     const payload = {
       url: values.url,
-      expirationDate: values.expirationDate ? new Date(values.expirationDate).toISOString() : null,
+      expirationDate: values.expirationDate
+        ? new Date(values.expirationDate).toISOString()
+        : null,
     };
 
     await onSubmit(payload);
     if (mode === "create") {
-      reset();
+      reset({ url: "", expirationDate: "" });
       toast.success("New short link created.");
     }
   };
@@ -46,7 +63,13 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
         <h3 className="text-xl">{mode === "create" ? "Create new short link" : "Edit link"}</h3>
         <p className="mt-2">Stay aligned with the backend schema: URL plus optional expiration date.</p>
       </div>
-      <form className="grid gap-4 md:grid-cols-[1.6fr_1fr_auto]" onSubmit={handleSubmit(submit)}>
+      <form
+        className={cn(
+          "grid gap-4",
+          mode === "edit" ? "grid-cols-1" : "grid-cols-1 md:grid-cols-[1.6fr_1fr_auto]"
+        )}
+        onSubmit={handleSubmit(submit)}
+      >
         <Input
           id={`${mode}-url`}
           label="Destination URL"
@@ -54,14 +77,16 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
           error={errors.url?.message}
           {...register("url")}
         />
-        <Input
+        <DateTimePicker
           id={`${mode}-expiration`}
           label="Expiration"
-          type="datetime-local"
+          value={expirationDateValue}
+          onChange={(newVal) =>
+            setValue("expirationDate", newVal, { shouldValidate: true, shouldDirty: true })
+          }
           error={errors.expirationDate?.message}
-          {...register("expirationDate")}
         />
-        <div className="flex items-end">
+        <div className={cn("flex items-end", mode === "edit" && "pt-2 justify-end")}>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Saving..." : mode === "create" ? "Shorten URL" : "Save changes"}
           </Button>
@@ -70,3 +95,4 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
     </Card>
   );
 }
+

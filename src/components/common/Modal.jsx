@@ -16,7 +16,7 @@ export function Modal({ open, title, children, onClose, footer }) {
             initial={{ y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
-            className="glass-panel w-full max-w-xl rounded-[32px] p-6"
+            className="glass-panel w-full max-w-2xl rounded-[32px] p-6"
             role="dialog"
             aria-modal="true"
           >
