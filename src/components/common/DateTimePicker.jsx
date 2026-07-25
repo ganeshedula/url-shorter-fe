@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   FiCalendar,
@@ -14,6 +15,7 @@ import { cn } from "../../utils/cn";
 export function DateTimePicker({ id, label, value, onChange, error, hint, className }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
+  const modalCardRef = useRef(null);
 
   // Parse current value or default to now
   const parsedDate = value ? new Date(value) : null;
@@ -49,21 +51,6 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
       setAmpm(validDate.getHours() >= 12 ? "PM" : "AM");
     }
   }, [value]);
-
-  // Click outside to close
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    }
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -248,7 +235,7 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
   };
 
   return (
-    <div ref={containerRef} className={cn("relative block space-y-1.5", isOpen ? "z-50" : "z-10")}>
+    <div ref={containerRef} className="block space-y-1.5">
       {label ? (
         <label htmlFor={id} className="block text-sm font-semibold text-text">
           {label}
@@ -302,172 +289,202 @@ export function DateTimePicker({ id, label, value, onChange, error, hint, classN
       ) : null}
       {!error && hint ? <p className="text-sm text-muted">{hint}</p> : null}
 
-      {/* Popover Dropdown */}
+      {/* Centered Modal Overlay with Blurred Backdrop */}
       <AnimatePresence>
-        {isOpen ? (
-          <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.96 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute left-0 right-0 sm:left-auto sm:right-0 top-full mt-2 z-[100] w-full sm:w-[350px] rounded-3xl border border-border bg-slate-900/95 p-3.5 shadow-2xl backdrop-blur-2xl text-slate-100 ring-1 ring-white/10 select-none"
-          >
-            {/* Presets Header */}
-            <div className="mb-3 space-y-1.5 border-b border-border/60 pb-2.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Quick presets</span>
-              <div className="flex flex-wrap gap-1.5">
-                {[
-                  { label: "Tomorrow", days: 1 },
-                  { label: "+3 Days", days: 3 },
-                  { label: "+1 Week", days: 7 },
-                  { label: "+1 Month", days: 30 },
-                ].map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => applyPreset(preset.days)}
-                    className="rounded-xl border border-border bg-surface-alt/50 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:border-primary/40 hover:bg-primary/10 hover:text-primary transition-all active:scale-95"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Calendar Header Navigation */}
-            <div className="mb-2.5 flex items-center justify-between px-1">
-              <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wide">
-                {monthNames[viewMonth]} {viewYear}
-              </h4>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={handlePrevMonth}
-                  className="flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
-                  aria-label="Previous Month"
+        {isOpen
+          ? createPortal(
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setIsOpen(false)}
+                className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-md select-none"
+              >
+                <motion.div
+                  ref={modalCardRef}
+                  initial={{ opacity: 0, scale: 0.92, y: 16 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, y: 12 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="glass-panel relative w-full max-w-[370px] rounded-3xl border border-white/15 bg-slate-900/95 p-5 shadow-2xl backdrop-blur-2xl text-slate-100 ring-1 ring-white/10"
                 >
-                  <FiChevronLeft className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={handleNextMonth}
-                  className="flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
-                  aria-label="Next Month"
-                >
-                  <FiChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
+                  {/* Modal Header */}
+                  <div className="mb-4 flex items-center justify-between border-b border-border/60 pb-3">
+                    <div className="flex items-center gap-2">
+                      <FiCalendar className="text-primary h-5 w-5" />
+                      <h3 className="text-base font-bold text-slate-100">Select Expiration</h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                      aria-label="Close date picker"
+                    >
+                      <FiX className="h-4 w-4" />
+                    </button>
+                  </div>
 
-            {/* Days of Week */}
-            <div className="mb-1 grid grid-cols-7 text-center">
-              {daysOfWeek.map((day) => (
-                <span key={day} className="text-[10px] font-bold text-muted uppercase">
-                  {day}
-                </span>
-              ))}
-            </div>
+                  {/* Presets Header */}
+                  <div className="mb-4 space-y-1.5 border-b border-border/60 pb-3">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Quick presets</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { label: "Tomorrow", days: 1 },
+                        { label: "+3 Days", days: 3 },
+                        { label: "+1 Week", days: 7 },
+                        { label: "+1 Month", days: 30 },
+                      ].map((preset) => (
+                        <button
+                          key={preset.label}
+                          type="button"
+                          onClick={() => applyPreset(preset.days)}
+                          className="rounded-xl border border-border bg-surface-alt/50 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:border-primary/40 hover:bg-primary/10 hover:text-primary transition-all active:scale-95"
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-            {/* Days Grid */}
-            <div className="grid grid-cols-7 gap-1">
-              {allCalendarDays.map((dayObj, index) => {
-                const selected = isSelected(dayObj);
-                const today = dayObj.isCurrentMonth && isToday(dayObj.day);
-
-                return (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => handleSelectDay(dayObj)}
-                    className={cn(
-                      "flex h-8 w-full items-center justify-center rounded-xl text-xs font-semibold transition-all relative",
-                      selected
-                        ? "bg-primary text-white shadow-md shadow-primary/30 scale-105 font-bold z-10"
-                        : dayObj.isCurrentMonth
-                        ? "text-slate-200 hover:bg-primary/20 hover:text-white"
-                        : "text-slate-600 hover:bg-surface-alt/40",
-                      today && !selected && "ring-1 ring-primary text-primary font-bold"
-                    )}
-                  >
-                    {dayObj.day}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Time Picker Bar */}
-            <div className="mt-3 pt-2.5 border-t border-border/60">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Time</span>
-                <div className="flex items-center gap-1.5">
-                  {/* Hours */}
-                  <select
-                    value={hours12}
-                    onChange={(e) => handleTimeChange(e.target.value, minutes, ampm)}
-                    className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary cursor-pointer"
-                  >
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const h = String(i + 1).padStart(2, "0");
-                      return <option key={h} value={h} className="bg-slate-900 text-slate-100">{h}</option>;
-                    })}
-                  </select>
-                  <span className="font-bold text-slate-400">:</span>
-                  {/* Minutes */}
-                  <select
-                    value={minutes}
-                    onChange={(e) => handleTimeChange(hours12, e.target.value, ampm)}
-                    className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary cursor-pointer"
-                  >
-                    {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map((m) => (
-                      <option key={m} value={m} className="bg-slate-900 text-slate-100">{m}</option>
-                    ))}
-                  </select>
-                  {/* AM / PM Toggle */}
-                  <div className="flex rounded-xl border border-border bg-surface-alt/60 p-0.5">
-                    {["AM", "PM"].map((p) => (
+                  {/* Calendar Header Navigation */}
+                  <div className="mb-3 flex items-center justify-between px-1">
+                    <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wide">
+                      {monthNames[viewMonth]} {viewYear}
+                    </h4>
+                    <div className="flex items-center gap-1">
                       <button
-                        key={p}
                         type="button"
-                        onClick={() => handleTimeChange(hours12, minutes, p)}
-                        className={cn(
-                          "px-2 py-0.5 text-xs font-bold rounded-lg transition-all",
-                          ampm === p
-                            ? "bg-primary text-white shadow-sm"
-                            : "text-slate-400 hover:text-slate-200"
-                        )}
+                        onClick={handlePrevMonth}
+                        className="flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
+                        aria-label="Previous Month"
                       >
-                        {p}
+                        <FiChevronLeft className="h-3.5 w-3.5" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={handleNextMonth}
+                        className="flex h-7 w-7 items-center justify-center rounded-xl border border-border bg-surface-alt/40 text-slate-300 hover:bg-surface-alt hover:text-white transition-colors"
+                        aria-label="Next Month"
+                      >
+                        <FiChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Days of Week */}
+                  <div className="mb-1 grid grid-cols-7 text-center">
+                    {daysOfWeek.map((day) => (
+                      <span key={day} className="text-[10px] font-bold text-muted uppercase">
+                        {day}
+                      </span>
                     ))}
                   </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Actions */}
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-border/60 pt-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  onChange("");
-                  setIsOpen(false);
-                }}
-                className="text-xs font-semibold text-slate-400 hover:text-red-400 transition-colors"
-              >
-                Clear date
-              </button>
+                  {/* Days Grid */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {allCalendarDays.map((dayObj, index) => {
+                      const selected = isSelected(dayObj);
+                      const today = dayObj.isCurrentMonth && isToday(dayObj.day);
 
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-md hover:bg-primary-hover active:scale-95 transition-all"
-              >
-                <FiCheck className="h-3.5 w-3.5" />
-                Done
-              </button>
-            </div>
-          </motion.div>
-        ) : null}
+                      return (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSelectDay(dayObj)}
+                          className={cn(
+                            "flex h-8 w-full items-center justify-center rounded-xl text-xs font-semibold transition-all relative",
+                            selected
+                              ? "bg-primary text-white shadow-md shadow-primary/30 scale-105 font-bold z-10"
+                              : dayObj.isCurrentMonth
+                              ? "text-slate-200 hover:bg-primary/20 hover:text-white"
+                              : "text-slate-600 hover:bg-surface-alt/40",
+                            today && !selected && "ring-1 ring-primary text-primary font-bold"
+                          )}
+                        >
+                          {dayObj.day}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Time Picker Bar */}
+                  <div className="mt-3 pt-2.5 border-t border-border/60">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted">Time</span>
+                      <div className="flex items-center gap-1.5">
+                        {/* Hours */}
+                        <select
+                          value={hours12}
+                          onChange={(e) => handleTimeChange(e.target.value, minutes, ampm)}
+                          className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary cursor-pointer"
+                        >
+                          {Array.from({ length: 12 }, (_, i) => {
+                            const h = String(i + 1).padStart(2, "0");
+                            return <option key={h} value={h} className="bg-slate-900 text-slate-100">{h}</option>;
+                          })}
+                        </select>
+                        <span className="font-bold text-slate-400">:</span>
+                        {/* Minutes */}
+                        <select
+                          value={minutes}
+                          onChange={(e) => handleTimeChange(hours12, e.target.value, ampm)}
+                          className="rounded-xl border border-border bg-surface-alt/60 px-2 py-1 text-xs font-bold text-slate-100 focus:outline-none focus:border-primary cursor-pointer"
+                        >
+                          {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map((m) => (
+                            <option key={m} value={m} className="bg-slate-900 text-slate-100">{m}</option>
+                          ))}
+                        </select>
+                        {/* AM / PM Toggle */}
+                        <div className="flex rounded-xl border border-border bg-surface-alt/60 p-0.5">
+                          {["AM", "PM"].map((p) => (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => handleTimeChange(hours12, minutes, p)}
+                              className={cn(
+                                "px-2 py-0.5 text-xs font-bold rounded-lg transition-all",
+                                ampm === p
+                                  ? "bg-primary text-white shadow-sm"
+                                  : "text-slate-400 hover:text-slate-200"
+                              )}
+                            >
+                              {p}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="mt-4 flex items-center justify-between gap-2 border-t border-border/60 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange("");
+                        setIsOpen(false);
+                      }}
+                      className="text-xs font-semibold text-slate-400 hover:text-red-400 transition-colors"
+                    >
+                      Clear date
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white shadow-md hover:bg-primary-hover active:scale-95 transition-all"
+                    >
+                      <FiCheck className="h-4 w-4" />
+                      Done
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>,
+              document.body
+            )
+          : null}
       </AnimatePresence>
     </div>
   );
