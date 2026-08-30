@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { FiCheck, FiFilter } from "react-icons/fi";
+import { FiArrowDown, FiArrowUp } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useOutletContext } from "react-router-dom";
 import { Breadcrumb } from "../../components/common/Breadcrumb";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
-import { Dropdown } from "../../components/common/Dropdown";
+import { SegmentedControl } from "../../components/common/SegmentedControl";
 import { EmptyState } from "../../components/common/EmptyState";
 import { ErrorState } from "../../components/common/ErrorState";
 import { Modal } from "../../components/common/Modal";
@@ -17,12 +17,10 @@ import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 import { usePageTitle } from "../../hooks/usePageTitle";
 import { useUrlLibrary } from "../../hooks/useUrlLibrary";
 import { urlService } from "../../services/urlService";
-import { cn } from "../../utils/cn";
-
 import { isUrlExpired } from "../../utils/formatters";
 
 export default function UrlsPage() {
-  usePageTitle("My URLs");
+  usePageTitle("My URLs — Nexly");
   const { globalSearch } = useOutletContext();
   const debouncedSearch = useDebouncedValue(globalSearch);
   const [page, setPage] = useState(0);
@@ -84,7 +82,7 @@ export default function UrlsPage() {
         expirationDate: payload.expirationDate,
         active: editingUrl.active,
       });
-      toast.success("Link updated.");
+      toast.success("Link updated");
       setEditingUrl(null);
       await refresh();
     } catch (error) {
@@ -97,7 +95,7 @@ export default function UrlsPage() {
   const handleDelete = async () => {
     try {
       await urlService.remove(deletingUrl.id);
-      toast.success("Link deleted.");
+      toast.success("Link deleted");
       setDeletingUrl(null);
       await refresh();
     } catch (error) {
@@ -107,13 +105,14 @@ export default function UrlsPage() {
 
   const handleCopy = async (shortUrl) => {
     await navigator.clipboard.writeText(shortUrl);
-    toast.success("Short URL copied.");
+    toast.success("Copied to clipboard");
   };
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-56" />
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-44" />
         <Skeleton className="h-96" />
       </div>
     );
@@ -123,66 +122,50 @@ export default function UrlsPage() {
     return <ErrorState description="We couldn't load your URL library." onRetry={refresh} />;
   }
 
-  const filterLabelMap = {
-    all: "All links",
-    active: "Active only",
-    inactive: "Inactive only",
-  };
+  const filterOptions = [
+    { label: "All", value: "all" },
+    { label: "Active", value: "active" },
+    { label: "Inactive", value: "inactive" },
+  ];
 
   return (
-    <div className="space-y-4">
-      <Breadcrumb items={[{ label: "Workspace" }, { label: "My URLs" }]} />
+    <div className="space-y-5">
+      {/* Header */}
+      <div>
+        <Breadcrumb items={[{ label: "Workspace" }, { label: "My URLs" }]} />
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-label">Link Management</h1>
+      </div>
+
+      {/* Create Link Card */}
       <div className="relative z-20">
         <UrlFormCard onSubmit={handleCreate} loading={saving} />
       </div>
 
-      <Card className="relative z-10">
-        <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      {/* URL List & Filter Section */}
+      <Card className="p-4 sm:p-6 space-y-4 relative z-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-separator/60 pb-3">
           <div>
-            <h2 className="text-2xl">Managed links</h2>
-            <p className="mt-2">Search, sort, update, copy, analyze, and remove links without touching backend contracts.</p>
+            <h2 className="text-base font-semibold text-label tracking-tight">Your Links</h2>
+            <p className="text-xs text-label-secondary">
+              {filteredItems.length} {filteredItems.length === 1 ? "link" : "links"} in current view
+            </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Dropdown
-              label={
-                <span className="inline-flex items-center gap-2 font-semibold text-text">
-                  <FiFilter className="text-primary" /> Filter: {filterLabelMap[statusFilter]}
-                </span>
-              }
+
+          <div className="flex flex-wrap items-center gap-2">
+            <SegmentedControl
+              options={filterOptions}
+              value={statusFilter}
+              onChange={setStatusFilter}
+            />
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setDirection((current) => (current === "desc" ? "asc" : "desc"))}
+              className="h-8 text-xs"
             >
-              <button
-                className={cn(
-                  "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold transition-colors",
-                  statusFilter === "all" ? "bg-primary text-white" : "text-slate-100 hover:bg-slate-800"
-                )}
-                onClick={() => setStatusFilter("all")}
-              >
-                <span>All links</span>
-                {statusFilter === "all" ? <FiCheck className="text-white" /> : null}
-              </button>
-              <button
-                className={cn(
-                  "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold transition-colors",
-                  statusFilter === "active" ? "bg-primary text-white" : "text-slate-100 hover:bg-slate-800"
-                )}
-                onClick={() => setStatusFilter("active")}
-              >
-                <span>Active only</span>
-                {statusFilter === "active" ? <FiCheck className="text-white" /> : null}
-              </button>
-              <button
-                className={cn(
-                  "flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold transition-colors",
-                  statusFilter === "inactive" ? "bg-primary text-white" : "text-slate-100 hover:bg-slate-800"
-                )}
-                onClick={() => setStatusFilter("inactive")}
-              >
-                <span>Inactive only</span>
-                {statusFilter === "inactive" ? <FiCheck className="text-white" /> : null}
-              </button>
-            </Dropdown>
-            <Button variant="secondary" onClick={() => setDirection((current) => (current === "desc" ? "asc" : "desc"))}>
-              Sort: {direction === "desc" ? "Newest" : "Oldest"}
+              {direction === "desc" ? <FiArrowDown size={13} /> : <FiArrowUp size={13} />}
+              <span>{direction === "desc" ? "Newest" : "Oldest"}</span>
             </Button>
           </div>
         </div>
@@ -196,22 +179,21 @@ export default function UrlsPage() {
               onDelete={setDeletingUrl}
               onQr={setQrUrl}
             />
-            <div className="mt-6">
-              <Pagination page={data.page} totalPages={data.totalPages} onPageChange={setPage} />
-            </div>
+            <Pagination page={data.page} totalPages={data.totalPages} onPageChange={setPage} />
           </>
         ) : (
           <EmptyState
-            title="No URLs match this view"
-            description="Try a different search term or status filter, or create a new link."
+            title="No URLs found"
+            description="Try changing your search term or status filter, or create a new short link above."
           />
         )}
       </Card>
 
+      {/* Edit Link Modal */}
       <Modal
         open={Boolean(editingUrl)}
         onClose={() => setEditingUrl(null)}
-        title="Edit link details"
+        title="Edit Link"
       >
         {editingUrl ? (
           <UrlFormCard
@@ -224,33 +206,42 @@ export default function UrlsPage() {
         ) : null}
       </Modal>
 
+      {/* Delete Link Confirmation Dialog */}
       <Modal
         open={Boolean(deletingUrl)}
         onClose={() => setDeletingUrl(null)}
-        title="Delete this short link?"
+        title="Delete Short Link?"
         footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="secondary" onClick={() => setDeletingUrl(null)}>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setDeletingUrl(null)}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={handleDelete}>
-              Delete link
+            <Button variant="destructive" size="sm" onClick={handleDelete}>
+              Delete
             </Button>
           </div>
         }
       >
-        <p>This action removes the selected link from your current workspace.</p>
+        <p className="text-xs sm:text-sm text-label-secondary">
+          Are you sure you want to delete <span className="font-semibold text-label">{deletingUrl?.shortUrl}</span>? This link will immediately stop redirecting.
+        </p>
       </Modal>
 
-      <Modal open={Boolean(qrUrl)} onClose={() => setQrUrl(null)} title="QR code preview">
+      {/* QR Code Modal */}
+      <Modal open={Boolean(qrUrl)} onClose={() => setQrUrl(null)} title="QR Code">
         {qrUrl ? (
-          <div className="space-y-4 text-center">
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrUrl.shortUrl)}`}
-              alt={`QR code for ${qrUrl.shortUrl}`}
-              className="mx-auto rounded-[24px] border border-border bg-white p-3"
-            />
-            <p className="text-sm">{qrUrl.shortUrl}</p>
+          <div className="space-y-4 text-center py-2">
+            <div className="inline-block rounded-apple-xl border border-separator bg-white p-4 shadow-sm">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl.shortUrl)}`}
+                alt={`QR code for ${qrUrl.shortUrl}`}
+                className="h-48 w-48 mx-auto"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-system-blue">{qrUrl.shortUrl}</p>
+              <p className="text-xs text-label-secondary mt-0.5">Scan with camera to open destination</p>
+            </div>
           </div>
         ) : null}
       </Modal>

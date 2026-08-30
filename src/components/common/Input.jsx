@@ -11,48 +11,51 @@ export const Input = forwardRef(function Input(
   const inputType = isPasswordInput ? (showPassword ? "text" : "password") : type;
 
   return (
-    <label htmlFor={id} className="block space-y-1.5">
+    <div className="w-full space-y-1.5 text-left">
       {label ? (
-        <span className="text-sm font-semibold text-text">
+        <label
+          htmlFor={id}
+          className="block text-xs font-semibold uppercase tracking-wider text-label-secondary"
+        >
           {label}
-        </span>
+        </label>
       ) : null}
       <div
         className={cn(
-          "glass-panel flex min-h-12 items-center gap-3 rounded-2xl px-4 transition-all duration-200",
+          "flex min-h-[42px] items-center gap-2.5 rounded-apple-md border bg-surface px-3.5 transition-all duration-150",
           error
-            ? "!border-red-500/80 ring-2 ring-red-500/20 bg-red-500/5"
-            : "hover:border-primary/25 focus-within:border-primary/40",
+            ? "border-system-red ring-1 ring-system-red/30 bg-system-red/5"
+            : "border-separator hover:border-separator-opaque focus-within:border-system-blue focus-within:ring-2 focus-within:ring-system-blue/20",
           className
         )}
       >
-        {Icon ? <Icon className="shrink-0 text-muted" size={18} /> : null}
+        {Icon ? <Icon className="shrink-0 text-label-tertiary" size={17} /> : null}
         <input
           ref={ref}
           id={id}
           type={inputType}
-          className="focus-ring h-11 w-full bg-transparent text-sm font-medium text-text placeholder:text-muted/80"
+          className="h-10 w-full bg-transparent text-sm text-label placeholder:text-label-tertiary focus:outline-none"
           {...props}
         />
         {isPasswordInput ? (
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="shrink-0 text-muted hover:text-text transition-colors p-1 rounded-lg focus:outline-none cursor-pointer"
+            className="shrink-0 rounded-apple-sm p-1 text-label-tertiary transition-colors hover:text-label focus:outline-none"
             aria-label={showPassword ? "Hide password" : "Show password"}
             tabIndex={-1}
           >
-            {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+            {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
           </button>
         ) : null}
       </div>
       {error ? (
-        <p className="flex items-center gap-1.5 text-xs font-semibold text-red-600 dark:text-red-400 pt-0.5">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-system-red pt-0.5">
           <FiAlertCircle className="h-3.5 w-3.5 shrink-0" />
           <span>{error}</span>
         </p>
       ) : null}
-      {!error && hint ? <p className="text-sm text-muted">{hint}</p> : null}
-    </label>
+      {!error && hint ? <p className="text-xs text-label-tertiary">{hint}</p> : null}
+    </div>
   );
 });

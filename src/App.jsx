@@ -64,30 +64,36 @@ export default function App() {
         </Suspense>
       </AnimatePresence>
 
+      {/* Apple Capsule Dynamic Island Toast */}
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
-          duration: 4000,
-          className:
-            "!rounded-2xl !border !border-slate-700/60 !bg-slate-900 !text-slate-50 dark:!bg-slate-900 dark:!text-slate-100 !px-4.5 !py-3.5 !text-sm !font-semibold shadow-2xl !z-[9999]",
+          duration: 3500,
+          style: {
+            background: "var(--color-surface)",
+            color: "var(--color-label-primary)",
+            border: "1px solid var(--color-separator)",
+            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.18)",
+            borderRadius: "9999px",
+            padding: "8px 16px",
+            fontSize: "13px",
+            fontWeight: 500,
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            zIndex: 99999,
+          },
           success: {
-            duration: 4000,
+            duration: 3000,
             iconTheme: {
-              primary: "#10b981",
+              primary: "#34C759",
               secondary: "#ffffff",
-            },
-            style: {
-              borderLeft: "4px solid #10b981",
             },
           },
           error: {
-            duration: 5000,
+            duration: 4000,
             iconTheme: {
-              primary: "#f43f5e",
+              primary: "#FF3B30",
               secondary: "#ffffff",
-            },
-            style: {
-              borderLeft: "4px solid #f43f5e",
             },
           },
         }}

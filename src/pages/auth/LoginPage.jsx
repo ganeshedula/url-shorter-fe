@@ -13,13 +13,13 @@ import { Alert } from "../../components/common/Alert";
 import { usePageTitle } from "../../hooks/usePageTitle";
 
 const schema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.string().email("Enter a valid email address"),
   password: z.string().min(1, "Password is required"),
   remember: z.boolean().optional(),
 });
 
 export default function LoginPage() {
-  usePageTitle("Login");
+  usePageTitle("Sign In — Nexly");
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isBusy } = useAuth();
@@ -40,84 +40,81 @@ export default function LoginPage() {
       await login(values);
       navigate(location.state?.from || "/app/dashboard", { replace: true });
     } catch (error) {
-      const errMsg = error.response?.data?.message || "Invalid credentials. Please check your email and password.";
+      const errMsg = error.response?.data?.message || "Invalid email or password.";
       setServerError(errMsg);
       toast.error(errMsg);
     }
   };
 
   return (
-    <div className="grid w-full max-w-6xl gap-6 lg:grid-cols-[1fr_520px]">
-      <Card className="hidden min-h-[680px] lg:flex lg:flex-col lg:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Welcome back</p>
-          <h1 className="mt-5 text-5xl">Your links, analytics, and sessions in one calm workspace.</h1>
-          <p className="mt-5 max-w-lg text-lg">
-            Sign in with the existing backend credentials and continue managing URLs without changing any API behavior.
+    <div className="w-full max-w-md mx-auto">
+      <Card className="p-6 sm:p-8 shadow-apple-elevated">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-label">Sign In</h1>
+          <p className="mt-1 text-xs sm:text-sm text-label-secondary">
+            Use your Nexly account credentials to continue.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {["Shorten faster", "Monitor activity", "Stay secure", "Switch themes"].map((item) => (
-            <div key={item} className="rounded-[24px] border border-border bg-surface-alt/40 p-4 text-sm font-semibold text-text">
-              {item}
-            </div>
-          ))}
-        </div>
-      </Card>
 
-      <Card className="mx-auto w-full max-w-[520px]">
-        <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Login</p>
-          <h2 className="mt-3 text-3xl">Access your dashboard</h2>
-        </div>
-        {serverError ? (
-          <div className="mb-5">
+        {serverError && (
+          <div className="mb-4">
             <Alert variant="danger" dismissible onClose={() => setServerError("")}>
               {serverError}
             </Alert>
           </div>
-        ) : null}
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <Input
             id="login-email"
             label="Email"
-            placeholder="you@company.com"
+            placeholder="name@example.com"
             icon={FiMail}
             error={errors.email?.message}
             {...register("email")}
           />
+
           <Input
             id="login-password"
             label="Password"
             type="password"
-            placeholder="Enter your password"
+            placeholder="Enter password"
             icon={FiLock}
             error={errors.password?.message}
             {...register("password")}
           />
-          <div className="flex items-center justify-between gap-3 text-sm">
-            <label className="flex items-center gap-2 font-medium text-text">
-              <input type="checkbox" className="h-4 w-4 rounded border-border" {...register("remember")} />
-              Remember me
+
+          <div className="flex items-center justify-between text-xs pt-1">
+            <label className="flex items-center gap-1.5 cursor-pointer text-label-secondary">
+              <input
+                type="checkbox"
+                className="h-3.5 w-3.5 rounded-apple-sm border-separator accent-system-blue"
+                {...register("remember")}
+              />
+              <span>Remember me</span>
             </label>
-            <Link to="/forgot-password" className="font-semibold text-primary hover:underline">
+            <Link to="/forgot-password" className="font-medium text-system-blue hover:underline">
               Forgot password?
             </Link>
           </div>
-          <Button type="submit" className="w-full" size="lg" disabled={isBusy}>
-            {isBusy ? "Signing in..." : "Sign in"}
-            <FiArrowRight />
+
+          <Button type="submit" className="w-full h-11" size="lg" disabled={isBusy}>
+            {isBusy ? (
+              "Signing in..."
+            ) : (
+              <>
+                <span>Sign In</span>
+                <FiArrowRight size={15} />
+              </>
+            )}
           </Button>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Button variant="secondary" type="button">Google placeholder</Button>
-            <Button variant="secondary" type="button">GitHub placeholder</Button>
-          </div>
-          <p className="text-center text-sm">
-            New here?{" "}
-            <Link to="/register" className="font-semibold text-primary hover:underline">
-              Create an account
+
+          <div className="pt-4 text-center text-xs text-label-secondary border-t border-separator/60">
+            Don't have an account?{" "}
+            <Link to="/register" className="font-semibold text-system-blue hover:underline">
+              Create one now
             </Link>
-          </p>
+          </div>
         </form>
       </Card>
     </div>

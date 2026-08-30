@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { FiArrowLeft, FiLock } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
@@ -7,38 +9,48 @@ import { Alert } from "../../components/common/Alert";
 import { usePageTitle } from "../../hooks/usePageTitle";
 
 export default function ResetPasswordPage() {
-  usePageTitle("Reset Password");
+  usePageTitle("Reset Password — Nexly");
   const [notice, setNotice] = useState("");
 
   const handleUpdate = () => {
-    const msg = "Reset password endpoint is not available in the current backend.";
+    const msg = "Password reset verification will be enabled in an upcoming release.";
     setNotice(msg);
-    toast(msg, { icon: "ℹ️" });
+    toast(msg);
   };
 
   return (
-    <Card className="w-full max-w-lg">
-      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-secondary">Reset password</p>
-      <h1 className="mt-4 text-3xl">Reset password</h1>
-      <p className="mt-4 text-muted">
-        This UI is ready, but password reset token endpoints are not supported by the backend yet.
-      </p>
-
-      {notice ? (
-        <div className="mt-6">
-          <Alert variant="info" dismissible onClose={() => setNotice("")}>
-            {notice}
-          </Alert>
+    <div className="w-full max-w-md mx-auto">
+      <Card className="p-6 sm:p-8 shadow-apple-elevated">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-label">Set New Password</h1>
+          <p className="mt-1 text-xs sm:text-sm text-label-secondary">
+            Choose a strong password to protect your account.
+          </p>
         </div>
-      ) : null}
 
-      <div className="mt-6 space-y-4">
-        <Input id="reset-password" label="New password" type="password" placeholder="Enter a new password" />
-        <Input id="reset-confirm-password" label="Confirm password" type="password" placeholder="Confirm the new password" />
-        <Button onClick={handleUpdate} className="w-full">
-          Update password
-        </Button>
-      </div>
-    </Card>
+        {notice && (
+          <div className="mb-4">
+            <Alert variant="info" dismissible onClose={() => setNotice("")}>
+              {notice}
+            </Alert>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <Input id="reset-password" label="New Password" type="password" placeholder="Enter new password" icon={FiLock} />
+          <Input id="reset-confirm-password" label="Confirm Password" type="password" placeholder="Confirm new password" icon={FiLock} />
+          <Button onClick={handleUpdate} className="w-full h-11" size="lg">
+            Update Password
+          </Button>
+
+          <div className="pt-4 text-center text-xs border-t border-separator/60">
+            <Link to="/login" className="inline-flex items-center gap-1.5 font-medium text-system-blue hover:underline">
+              <FiArrowLeft size={13} />
+              <span>Back to Sign In</span>
+            </Link>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

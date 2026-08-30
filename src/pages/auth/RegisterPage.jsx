@@ -15,12 +15,12 @@ import { getPasswordStrength } from "../../utils/passwordStrength";
 
 const schema = z.object({
   username: z.string().max(100, "Username can be at most 100 characters").optional(),
-  email: z.string().email("Enter a valid email"),
+  email: z.string().email("Enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export default function RegisterPage() {
-  usePageTitle("Register");
+  usePageTitle("Create Account — Nexly");
   const navigate = useNavigate();
   const { register: signUp, isBusy } = useAuth();
   const [serverError, setServerError] = useState("");
@@ -43,88 +43,92 @@ export default function RegisterPage() {
       await signUp(values);
       navigate("/app/dashboard", { replace: true });
     } catch (error) {
-      const errMsg = error.response?.data?.message || "Unable to create your account. Please try again.";
+      const errMsg = error.response?.data?.message || "Unable to create your account.";
       setServerError(errMsg);
       toast.error(errMsg);
     }
   };
 
   return (
-    <div className="grid w-full max-w-6xl gap-6 lg:grid-cols-[520px_1fr]">
-      <Card className="mx-auto w-full max-w-[520px]">
-        <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-secondary">Register</p>
-          <h2 className="mt-3 text-3xl">Create your premium workspace</h2>
+    <div className="w-full max-w-md mx-auto">
+      <Card className="p-6 sm:p-8 shadow-apple-elevated">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-label">Create Account</h1>
+          <p className="mt-1 text-xs sm:text-sm text-label-secondary">
+            Get started with your free Nexly link workspace.
+          </p>
         </div>
-        {serverError ? (
-          <div className="mb-5">
+
+        {serverError && (
+          <div className="mb-4">
             <Alert variant="danger" dismissible onClose={() => setServerError("")}>
               {serverError}
             </Alert>
           </div>
-        ) : null}
-        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <Input
             id="register-username"
-            label="Username"
-            placeholder="Ganesh"
+            label="Name (Optional)"
+            placeholder="Jane Appleseed"
             icon={FiUser}
             error={errors.username?.message}
             {...register("username")}
           />
+
           <Input
             id="register-email"
             label="Email"
-            placeholder="you@company.com"
+            placeholder="name@example.com"
             icon={FiMail}
             error={errors.email?.message}
             {...register("email")}
           />
-          <div className="space-y-2">
+
+          <div className="space-y-1.5">
             <Input
               id="register-password"
               label="Password"
               type="password"
-              placeholder="Create a secure password"
+              placeholder="At least 8 characters"
               icon={FiLock}
               error={errors.password?.message}
               {...register("password")}
             />
-            <div className="h-2 overflow-hidden rounded-full bg-slate-300/20">
-              <div className={`h-2 ${passwordStrength.width} ${passwordStrength.color} rounded-full transition-all duration-300`} />
-            </div>
-            <p className="text-sm">
-              Password strength: <span className="font-semibold text-text">{passwordStrength.label}</span>
-            </p>
+
+            {watch("password") && (
+              <div className="space-y-1 pt-1">
+                <div className="h-1 w-full rounded-full bg-surface-secondary overflow-hidden">
+                  <div
+                    className={`h-full ${passwordStrength.width} ${passwordStrength.color} transition-all duration-300`}
+                  />
+                </div>
+                <p className="text-[11px] text-label-secondary">
+                  Strength: <span className="font-semibold text-label">{passwordStrength.label}</span>
+                </p>
+              </div>
+            )}
           </div>
-          <Button type="submit" className="w-full" size="lg" disabled={isBusy}>
-            {isBusy ? "Creating account..." : "Create account"}
-            <FiArrowRight />
+
+          <Button type="submit" className="w-full h-11" size="lg" disabled={isBusy}>
+            {isBusy ? (
+              "Creating account..."
+            ) : (
+              <>
+                <span>Create Account</span>
+                <FiArrowRight size={15} />
+              </>
+            )}
           </Button>
-          <p className="text-center text-sm">
+
+          <div className="pt-4 text-center text-xs text-label-secondary border-t border-separator/60">
             Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
+            <Link to="/login" className="font-semibold text-system-blue hover:underline">
               Sign in
             </Link>
-          </p>
+          </div>
         </form>
-      </Card>
-
-      <Card className="hidden min-h-[680px] lg:flex lg:flex-col lg:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-secondary">Why teams upgrade the experience</p>
-          <h1 className="mt-5 text-5xl">A cleaner surface for the backend you already trust.</h1>
-          <p className="mt-5 max-w-lg text-lg">
-            This redesign keeps API compatibility intact while modernizing every major interaction around auth, management, analytics, and settings.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {["Responsive", "Accessible", "Extensible"].map((item) => (
-            <div key={item} className="rounded-[24px] border border-border bg-surface-alt/40 p-4 text-sm font-semibold text-text">
-              {item}
-            </div>
-          ))}
-        </div>
       </Card>
     </div>
   );

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FiArrowRight, FiBarChart2, FiCheckCircle, FiClock, FiCommand, FiLock, FiZap } from "react-icons/fi";
+import { FiArrowRight, FiBarChart2, FiCheck, FiClock, FiGlobe, FiLock, FiZap } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
@@ -7,34 +7,63 @@ import { Button } from "../components/common/Button";
 import { Card } from "../components/common/Card";
 import { Input } from "../components/common/Input";
 import { Badge } from "../components/common/Badge";
-import { featureHighlights } from "../constants/navigation";
 import { useAuth } from "../context/AuthContext";
 import { urlService } from "../services/urlService";
 import { usePageTitle } from "../hooks/usePageTitle";
 
+const features = [
+  {
+    icon: FiZap,
+    title: "Instant Routing",
+    description: "Generate compact, memorable short links with zero latency and high availability.",
+  },
+  {
+    icon: FiBarChart2,
+    title: "Clear Analytics",
+    description: "Inspect daily volume, browser, platform, and regional breakdowns at a glance.",
+  },
+  {
+    icon: FiClock,
+    title: "Lifecycle & Expiry",
+    description: "Set expiration dates or deactivate links anytime with complete management control.",
+  },
+  {
+    icon: FiLock,
+    title: "Secure Sessions",
+    description: "Protected endpoints backed by reliable JWT authentication and session management.",
+  },
+];
+
 const testimonials = [
-  { name: "Mina Patel", role: "Growth Lead", quote: "The redesign feels like a real product dashboard, not a bolt-on tool." },
-  { name: "Arjun Rao", role: "Product Designer", quote: "Fast, calm, and incredibly legible. We finally enjoy checking link analytics." },
-  { name: "Ava Turner", role: "Operations Manager", quote: "The creation flow is effortless, and the dashboard has zero wasted space." },
+  {
+    name: "Mina Patel",
+    role: "Product Lead",
+    quote: "The interface is calm, fast, and obvious. It feels like an authentic system tool.",
+  },
+  {
+    name: "Arjun Rao",
+    role: "Design Engineer",
+    quote: "No visual noise. Links shorten instantly and analytics give the exact metrics I care about.",
+  },
 ];
 
 const faqs = [
   {
-    question: "Can I keep using the existing backend?",
-    answer: "Yes. This frontend is designed around the current authentication and URL APIs without changing backend contracts.",
+    question: "How fast is link redirection?",
+    answer: "Short links are resolved directly with low overhead and instant HTTP 302 redirection.",
   },
   {
-    question: "Does it support team workflows?",
-    answer: "The UI is structured like a SaaS product, so adding teams, billing, or richer analytics later will fit naturally.",
+    question: "Can I set custom link expiration?",
+    answer: "Yes, you can specify an exact expiration date and time when creating or editing any short link.",
   },
   {
-    question: "What about dark mode?",
-    answer: "Dark and light themes are built into the design system through shared CSS variables.",
+    question: "Is link tracking included?",
+    answer: "Yes, click counts, daily activity trends, and client telemetry are recorded for each short link.",
   },
 ];
 
 export default function HomePage() {
-  usePageTitle("Premium URL Shortener");
+  usePageTitle("Nexly — Clean, Modern URL Shortener");
   const { isAuthenticated } = useAuth();
   const { register, handleSubmit, watch, reset } = useForm({
     defaultValues: { url: "" },
@@ -43,12 +72,10 @@ export default function HomePage() {
   const liveUrl = watch("url");
 
   const onSubmit = async ({ url }) => {
-    if (!url) {
-      return;
-    }
+    if (!url) return;
 
     if (!isAuthenticated) {
-      toast("Create an account to generate a live short link.");
+      toast("Please sign in or create an account to shorten URLs.");
       return;
     }
 
@@ -57,198 +84,154 @@ export default function HomePage() {
       toast.success(`Short link created: ${response.data.shortCode}`);
       reset();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to shorten this URL right now.");
+      toast.error(error.response?.data?.message || "Unable to create short link.");
     }
   };
 
   return (
-    <div className="space-y-20 pt-10">
+    <div className="space-y-16 sm:space-y-24 py-8 sm:py-12">
+      {/* Hero Section */}
       <section className="section-shell">
-        <div className="hero-grid glass-panel relative overflow-hidden rounded-[36px] px-6 py-10 sm:px-10 lg:px-12 lg:py-14">
-          <div className="pointer-events-none absolute right-8 top-8 hidden h-24 w-24 rounded-full bg-primary/20 blur-3xl lg:block" />
-          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-              <Badge variant="primary">Premium SaaS-style redesign</Badge>
-              <div className="space-y-5">
-                <h1 className="max-w-3xl text-5xl leading-tight sm:text-6xl">
-                  Shorten links with a{" "}
-                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    cleaner product experience
-                  </span>
-                  .
-                </h1>
-                <p className="max-w-2xl text-lg">
-                  Nexly turns your URL shortener into a modern workspace with sharper analytics, calmer workflows, and a portfolio-grade interface.
-                </p>
-              </div>
+        <div className="mx-auto max-w-3xl text-center space-y-4">
+          <Badge variant="primary" className="mb-2">
+            Engineered for clarity
+          </Badge>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-label leading-[1.1]">
+            Links made simple.
+          </h1>
+          <p className="mx-auto max-w-xl text-base sm:text-lg text-label-secondary leading-relaxed">
+            Shorten, manage, and inspect your links in a calm, modern workspace designed for effortless navigation.
+          </p>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:grid-cols-[1fr_auto]">
-                <Input
-                  id="landing-url"
-                  aria-label="Enter a URL to shorten"
-                  placeholder="Paste a long URL to preview the experience"
-                  {...register("url")}
-                />
-                <Button type="submit" size="lg">
-                  Shorten now
-                  <FiArrowRight />
+          {/* Interactive URL Shortener Card */}
+          <div className="mx-auto mt-8 max-w-xl">
+            <Card className="p-4 sm:p-5 shadow-apple-elevated">
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col sm:flex-row gap-2.5">
+                <div className="flex-1">
+                  <Input
+                    id="hero-url"
+                    aria-label="URL to shorten"
+                    placeholder="Paste a link to preview (e.g. https://apple.com)"
+                    icon={FiGlobe}
+                    {...register("url")}
+                  />
+                </div>
+                <Button type="submit" size="lg" className="h-[42px] shrink-0">
+                  <span>Shorten</span>
+                  <FiArrowRight size={15} />
                 </Button>
               </form>
 
-              <div className="flex flex-wrap gap-6 text-sm">
-                {["Fast creation flow", "Dark + light mode", "Analytics dashboard", "Refresh-token auth"].map((item) => (
-                  <div key={item} className="flex items-center gap-2 font-semibold text-text">
-                    <FiCheckCircle className="text-success" />
-                    {item}
-                  </div>
-                ))}
+              {/* Dynamic Live Preview */}
+              <div className="mt-3.5 flex items-center justify-between border-t border-separator pt-3 text-xs">
+                <span className="text-label-secondary font-medium">Projected link:</span>
+                <span className="font-mono font-semibold text-system-blue">
+                  {liveUrl
+                    ? `nex.ly/${btoa(liveUrl).replace(/=/g, "").slice(0, 7)}`
+                    : "nex.ly/preview"}
+                </span>
               </div>
-            </motion.div>
+            </Card>
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 -z-10 animate-float rounded-[36px] bg-gradient-to-r from-primary/20 via-secondary/20 to-accent/20 blur-3xl" />
-              <Card className="space-y-6">
-                <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-4 text-xs font-medium text-label-secondary">
+            <span className="flex items-center gap-1.5">
+              <FiCheck className="text-system-green" /> Free to use
+            </span>
+            <span className="flex items-center gap-1.5">
+              <FiCheck className="text-system-green" /> Click telemetry
+            </span>
+            <span className="flex items-center gap-1.5">
+              <FiCheck className="text-system-green" /> QR ready
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Grid */}
+      <section id="features" className="section-shell">
+        <div className="mb-8 text-center sm:text-left">
+          <p className="text-xs font-semibold uppercase tracking-wider text-system-blue">Features</p>
+          <h2 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-label">
+            Everything you need. Nothing you don't.
+          </h2>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+              >
+                <Card className="h-full p-5 flex flex-col justify-between">
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted">Live product preview</p>
-                    <h2 className="mt-2 text-2xl">Control center</h2>
-                  </div>
-                  <Badge variant="success">Online</Badge>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-[24px] border border-border bg-surface-alt/40 p-4">
-                    <p className="text-sm font-semibold text-muted">Projected short link</p>
-                    <h3 className="mt-3 text-xl text-primary">
-                      {liveUrl ? `nex.ly/${btoa(liveUrl).replace(/=/g, "").slice(0, 8)}` : "nex.ly/launch24"}
-                    </h3>
-                    <p className="mt-2 text-sm">Generated with the current backend once you sign in.</p>
-                  </div>
-                  <div className="rounded-[24px] border border-border bg-surface-alt/40 p-4">
-                    <p className="text-sm font-semibold text-muted">Click velocity</p>
-                    <div className="mt-4 h-24 rounded-[20px] bg-gradient-to-br from-primary/15 via-secondary/10 to-accent/10" />
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {[FiZap, FiBarChart2, FiCommand].map((Icon, index) => (
-                    <div key={index} className="rounded-[24px] border border-border p-4">
-                      <Icon className="text-primary" size={20} />
-                      <p className="mt-4 text-sm font-semibold text-text">
-                        {["Faster creation", "Actionable analytics", "QR-ready sharing"][index]}
-                      </p>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-apple-md bg-system-blue/10 text-system-blue">
+                      <Icon size={18} />
                     </div>
-                  ))}
+                    <h3 className="mt-4 text-base font-semibold text-label tracking-tight">{item.title}</h3>
+                    <p className="mt-1.5 text-xs sm:text-sm text-label-secondary leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Social Proof & Preview */}
+      <section id="preview" className="section-shell">
+        <div className="grid gap-6 lg:grid-cols-2 items-center">
+          <div className="space-y-4">
+            <Badge variant="primary">Control Center</Badge>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-label">
+              A single dashboard for all your link assets.
+            </h2>
+            <p className="text-sm sm:text-base text-label-secondary leading-relaxed">
+              Track link activity, manage expiration states, generate QR codes, and monitor performance trends across platforms with zero setup friction.
+            </p>
+            <div className="pt-2">
+              <Link to="/register">
+                <Button size="lg">
+                  Create free workspace
+                  <FiArrowRight size={15} />
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            {testimonials.map((t) => (
+              <Card key={t.name} className="p-4 sm:p-5">
+                <p className="text-sm text-label italic leading-relaxed">“{t.quote}”</p>
+                <div className="mt-3 flex items-center justify-between border-t border-separator/60 pt-2.5 text-xs">
+                  <span className="font-semibold text-label">{t.name}</span>
+                  <span className="text-label-tertiary">{t.role}</span>
                 </div>
               </Card>
-            </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section id="features" className="section-shell">
-        <div className="mb-8 flex items-end justify-between gap-6">
-          <div>
-            <Badge variant="secondary">Feature set</Badge>
-            <h2 className="mt-3 text-4xl">Built to feel like a serious SaaS product</h2>
-          </div>
-        </div>
-        <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
-          {featureHighlights.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.08 }}
-              className="glass-panel rounded-[28px] p-6"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <feature.icon size={22} />
-              </div>
-              <h3 className="mt-6 text-xl">{feature.title}</h3>
-              <p className="mt-3">{feature.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <section className="section-shell">
-        <div className="grid gap-5 lg:grid-cols-3">
-          {[
-            { icon: FiZap, title: "Fast", text: "Create branded short links with one focused action." },
-            { icon: FiLock, title: "Secure", text: "JWT sessions, refresh rotation, and consistent protected routes." },
-            { icon: FiClock, title: "History-aware", text: "Track recency, expiration, and momentum at a glance." },
-          ].map((item) => (
-            <Card key={item.title}>
-              <item.icon className="text-primary" size={22} />
-              <h3 className="mt-5 text-2xl">{item.title}</h3>
-              <p className="mt-3">{item.text}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section id="about" className="section-shell">
-        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-          <Card>
-            <Badge variant="primary">How it works</Badge>
-            <div className="mt-8 space-y-6">
-              {[
-                "Create an account and authenticate with the existing backend.",
-                "Generate short links, manage lifecycle status, and search your library.",
-                "Review analytics and recent click events in a focused dashboard.",
-              ].map((step, index) => (
-                <div key={step} className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-white">
-                    {index + 1}
-                  </div>
-                  <p>{step}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-          <Card>
-            <Badge variant="secondary">Social proof</Badge>
-            <div className="mt-8 grid gap-4">
-              {testimonials.map((testimonial) => (
-                <div key={testimonial.name} className="rounded-[24px] border border-border p-5">
-                  <p className="text-base text-text">“{testimonial.quote}”</p>
-                  <div className="mt-4">
-                    <p className="font-semibold text-text">{testimonial.name}</p>
-                    <p className="text-sm">{testimonial.role}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-      </section>
-
-      <section id="pricing" className="section-shell">
-        <Card className="text-center">
-          <Badge>Pricing coming soon</Badge>
-          <h2 className="mt-4 text-4xl">The interface is ready for a billing layer when the backend is.</h2>
-          <p className="mx-auto mt-4 max-w-2xl">
-            The current release focuses on premium product feel, URL workflows, and dashboard analytics while keeping API compatibility intact.
-          </p>
-          <div className="mt-8 flex justify-center">
-            <Link to="/register">
-              <Button size="lg">Start for free</Button>
-            </Link>
-          </div>
-        </Card>
-      </section>
-
+      {/* FAQ Section */}
       <section id="faq" className="section-shell">
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="mb-6 text-center sm:text-left">
+          <p className="text-xs font-semibold uppercase tracking-wider text-system-blue">Questions</p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight text-label">Frequently Asked Questions</h2>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
           {faqs.map((faq) => (
-            <Card key={faq.question}>
-              <h3 className="text-xl">{faq.question}</h3>
-              <p className="mt-3">{faq.answer}</p>
+            <Card key={faq.question} className="p-5">
+              <h3 className="text-sm font-semibold text-label">{faq.question}</h3>
+              <p className="mt-2 text-xs sm:text-sm text-label-secondary leading-relaxed">{faq.answer}</p>
             </Card>
           ))}
         </div>

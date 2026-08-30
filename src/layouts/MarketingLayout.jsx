@@ -4,12 +4,13 @@ import { Navbar } from "../components/layouts/Navbar";
 
 export function MarketingLayout() {
   return (
-    <div className="relative overflow-x-hidden pb-10">
-      <div className="pointer-events-none absolute inset-0 bg-aurora" />
-      <Navbar />
-      <main>
-        <Outlet />
-      </main>
+    <div className="min-h-screen bg-app text-label flex flex-col justify-between">
+      <div>
+        <Navbar />
+        <main>
+          <Outlet />
+        </main>
+      </div>
       <Footer />
     </div>
   );

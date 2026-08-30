@@ -1,14 +1,15 @@
-import { motion } from "framer-motion";
 import { cn } from "../../utils/cn";
 
-export function Card({ className, children }) {
+export function Card({ className, children, ...props }) {
   return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.2 }}
-      className={cn("glass-panel rounded-[28px] p-6", className)}
+    <div
+      className={cn(
+        "rounded-apple-xl border border-separator bg-surface p-5 sm:p-6 shadow-apple transition-colors",
+        className
+      )}
+      {...props}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

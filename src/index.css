@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,89 +6,189 @@
 
 :root {
   color-scheme: light;
-  --color-primary: #2563eb;
-  --color-secondary: #7c3aed;
-  --color-accent: #06b6d4;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-bg: #f8fafc;
-  --color-surface: rgba(255, 255, 255, 0.84);
-  --color-surface-alt: #eef2ff;
-  --color-text: #0f172a;
-  --color-muted: #475569;
-  --color-border: rgba(148, 163, 184, 0.24);
+  
+  /* Apple Light Appearance System Colors */
+  --color-bg: #F2F2F7;
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F2F2F7;
+  --color-surface-tertiary: #E5E5EA;
+  --color-surface-alt: #F2F2F7;
+  
+  --color-separator: rgba(60, 60, 67, 0.12);
+  --color-separator-opaque: #C6C6C8;
+  
+  --color-label-primary: #000000;
+  --color-label-secondary: #636366;
+  --color-label-tertiary: #8E8E93;
+  --color-label-quaternary: #AEAEB2;
+
+  --color-system-blue: #007AFF;
+  --color-system-green: #34C759;
+  --color-system-red: #FF3B30;
+  --color-system-orange: #FF9500;
+  --color-system-purple: #AF52DE;
+  --color-system-teal: #30B0C7;
+  --color-system-gray: #8E8E93;
+
+  /* Aliases */
+  --color-primary: #007AFF;
+  --color-secondary: #8E8E93;
+  --color-accent: #AF52DE;
+  --color-success: #34C759;
+  --color-danger: #FF3B30;
+  --color-text: #000000;
+  --color-muted: #636366;
+  --color-border: rgba(60, 60, 67, 0.12);
+
+  /* Navbar Glass Materials */
+  --navbar-glass-top: rgba(255, 255, 255, 0.8);
+  --navbar-glass-scrolled: rgba(255, 255, 255, 0.75);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --color-bg: #0f172a;
-  --color-surface: rgba(15, 23, 42, 0.76);
-  --color-surface-alt: rgba(30, 41, 59, 0.92);
-  --color-text: #f8fafc;
-  --color-muted: #94a3b8;
-  --color-border: rgba(148, 163, 184, 0.18);
+  
+  /* Apple Dark Appearance System Colors */
+  --color-bg: #000000;
+  --color-surface: #1C1C1E;
+  --color-surface-secondary: #2C2C2E;
+  --color-surface-tertiary: #3A3A3C;
+  --color-surface-alt: #2C2C2E;
+  
+  --color-separator: rgba(84, 84, 88, 0.36);
+  --color-separator-opaque: #38383A;
+  
+  --color-label-primary: #FFFFFF;
+  --color-label-secondary: #8E8E93;
+  --color-label-tertiary: #636366;
+  --color-label-quaternary: #48484A;
+
+  --color-system-blue: #0A84FF;
+  --color-system-green: #30D158;
+  --color-system-red: #FF453A;
+  --color-system-orange: #FF9F0A;
+  --color-system-purple: #BF5AF2;
+  --color-system-teal: #40CBE0;
+  --color-system-gray: #8E8E93;
+
+  /* Aliases */
+  --color-primary: #0A84FF;
+  --color-secondary: #8E8E93;
+  --color-accent: #BF5AF2;
+  --color-success: #30D158;
+  --color-danger: #FF453A;
+  --color-text: #FFFFFF;
+  --color-muted: #8E8E93;
+  --color-border: rgba(84, 84, 88, 0.36);
+
+  /* Navbar Glass Materials */
+  --navbar-glass-top: rgba(18, 18, 20, 0.82);
+  --navbar-glass-scrolled: rgba(24, 24, 28, 0.76);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--color-separator);
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
-    @apply scroll-smooth;
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply min-h-screen bg-app font-sans text-text;
-    background-image: radial-gradient(circle at top, rgba(37, 99, 235, 0.08), transparent 30%),
-      radial-gradient(circle at 90% 10%, rgba(124, 58, 237, 0.08), transparent 20%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+    background-color: var(--color-bg);
+    color: var(--color-label-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: -0.011em;
+    min-height: 100vh;
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    @apply font-bold tracking-tight text-text;
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-label-primary);
+    letter-spacing: -0.022em;
   }
 
   p {
-    @apply font-medium text-muted;
+    color: var(--color-label-secondary);
+    line-height: 1.5;
   }
 
-  button,
-  a,
-  input,
-  textarea,
-  select {
-    @apply outline-none;
+  button, a, input, textarea, select {
+    outline: none;
   }
 
   ::selection {
-    background: rgba(37, 99, 235, 0.18);
+    background: rgba(0, 122, 255, 0.2);
+    color: inherit;
   }
 }
 
 @layer components {
-  .glass-panel {
-    @apply border border-border bg-surface shadow-glass backdrop-blur-xl;
+  /* Apple Translucent Chrome */
+  .apple-glass {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--color-separator);
   }
 
-  .hero-grid {
-    background-size: 42px 42px;
-    @apply bg-grid-fade;
+  [data-theme="dark"] .apple-glass {
+    background-color: rgba(28, 28, 30, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--color-separator);
+  }
+
+  .glass-panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-separator);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
   }
 
   .section-shell {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 72rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
-  .focus-ring {
-    outline: none;
+  @media (min-width: 640px) {
+    .section-shell {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-shell {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
 
   .focus-ring:focus-visible {
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.45), 0 0 0 5px var(--color-bg);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
+  }
+
+  /* React Hot Toast Dark Mode Visibility */
+  div[role="status"] {
+    background-color: var(--color-surface) !important;
+    color: var(--color-label-primary) !important;
+    border-color: var(--color-separator) !important;
+  }
+
+  [data-theme="dark"] div[role="status"],
+  .dark div[role="status"] {
+    background-color: #1C1C1E !important;
+    color: #FFFFFF !important;
+    border-color: rgba(84, 84, 88, 0.5) !important;
   }
 }
 

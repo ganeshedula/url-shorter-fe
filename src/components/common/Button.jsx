@@ -4,33 +4,42 @@ import { cn } from "../../utils/cn";
 
 const variants = {
   primary:
-    "bg-primary text-white shadow-glow hover:bg-blue-500 active:bg-blue-600 disabled:bg-blue-300",
+    "bg-system-blue text-white hover:opacity-90 active:opacity-80 shadow-sm border border-transparent font-medium",
   secondary:
-    "border border-border bg-surface-alt text-text hover:border-primary/30 hover:bg-primary/10",
-  ghost: "bg-transparent text-text hover:bg-white/10 dark:hover:bg-white/5",
-  danger: "bg-danger text-white hover:bg-red-500 active:bg-red-600",
+    "bg-surface-secondary text-label hover:bg-surface-tertiary active:opacity-75 border border-separator font-medium",
+  tertiary:
+    "bg-transparent text-system-blue hover:bg-system-blue/10 active:bg-system-blue/15 border border-transparent font-medium",
+  ghost:
+    "bg-transparent text-label hover:bg-surface-secondary active:bg-surface-tertiary border border-transparent font-medium",
+  destructive:
+    "bg-system-red text-white hover:opacity-90 active:opacity-80 shadow-sm border border-transparent font-medium",
+  danger:
+    "bg-system-red text-white hover:opacity-90 active:opacity-80 shadow-sm border border-transparent font-medium",
 };
 
 const sizes = {
-  sm: "h-10 rounded-2xl px-4 text-sm",
-  md: "h-11 rounded-2xl px-5 text-sm",
-  lg: "h-12 rounded-2xl px-6 text-base",
+  xs: "h-7 rounded-apple-sm px-2.5 text-xs",
+  sm: "h-8 rounded-apple-sm px-3 text-xs",
+  md: "h-9 rounded-apple-md px-4 text-sm",
+  lg: "h-11 rounded-apple-lg px-5 text-sm sm:text-base",
+  xl: "h-12 rounded-apple-lg px-6 text-base font-semibold",
 };
 
 export const Button = forwardRef(function Button(
-  { className, children, variant = "primary", size = "md", type = "button", ...props },
+  { className, children, variant = "primary", size = "md", type = "button", disabled, ...props },
   ref
 ) {
   return (
     <motion.button
       ref={ref}
       type={type}
-      whileHover={{ y: -1 }}
-      whileTap={{ scale: 0.98 }}
+      disabled={disabled}
+      whileTap={disabled ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.1 }}
       className={cn(
-        "focus-ring inline-flex cursor-pointer items-center justify-center gap-2 font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-70",
-        variants[variant],
-        sizes[size],
+        "focus-ring inline-flex cursor-pointer items-center justify-center gap-2 select-none transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-40",
+        variants[variant] || variants.primary,
+        sizes[size] || sizes.md,
         className
       )}
       {...props}

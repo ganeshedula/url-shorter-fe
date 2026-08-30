@@ -2,26 +2,26 @@ export function HorizontalBarList({ title, items = [] }) {
   const maxValue = Math.max(...items.map((item) => item.value), 1);
 
   return (
-    <div className="rounded-[24px] border border-border p-5">
-      <h3 className="text-lg">{title}</h3>
-      <div className="mt-5 space-y-4">
+    <div className="rounded-apple-xl border border-separator bg-surface p-5 shadow-apple">
+      <h3 className="text-sm font-semibold text-label tracking-tight">{title}</h3>
+      <div className="mt-4 space-y-3">
         {items.length ? (
           items.map((item) => (
-            <div key={item.label} className="space-y-2">
-              <div className="flex items-center justify-between gap-3 text-sm">
-                <span className="font-semibold text-text">{item.label}</span>
-                <span className="text-muted">{item.value}</span>
+            <div key={item.label} className="space-y-1.5">
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-medium text-label truncate">{item.label}</span>
+                <span className="font-semibold text-label shrink-0">{item.value}</span>
               </div>
-              <div className="h-2 rounded-full bg-slate-300/20">
+              <div className="h-1.5 rounded-full bg-surface-secondary overflow-hidden">
                 <div
-                  className="h-2 rounded-full bg-gradient-to-r from-primary via-secondary to-accent"
+                  className="h-full rounded-full bg-system-blue transition-all duration-300"
                   style={{ width: `${(item.value / maxValue) * 100}%` }}
                 />
               </div>
             </div>
           ))
         ) : (
-          <p>No data yet.</p>
+          <p className="text-xs text-label-secondary">No geographic data recorded yet.</p>
         )}
       </div>
     </div>

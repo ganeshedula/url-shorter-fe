@@ -4,29 +4,29 @@ import { cn } from "../../utils/cn";
 
 const variantStyles = {
   danger: {
-    container: "bg-red-500/10 border-red-500/30 text-red-950 dark:text-red-200",
+    container: "bg-system-red/10 border-system-red/20 text-label",
     icon: FiAlertCircle,
-    iconColor: "text-red-600 dark:text-red-400",
+    iconColor: "text-system-red",
   },
   error: {
-    container: "bg-red-500/10 border-red-500/30 text-red-950 dark:text-red-200",
+    container: "bg-system-red/10 border-system-red/20 text-label",
     icon: FiAlertCircle,
-    iconColor: "text-red-600 dark:text-red-400",
+    iconColor: "text-system-red",
   },
   success: {
-    container: "bg-emerald-500/10 border-emerald-500/30 text-emerald-950 dark:text-emerald-200",
+    container: "bg-system-green/10 border-system-green/20 text-label",
     icon: FiCheckCircle,
-    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconColor: "text-system-green",
   },
   warning: {
-    container: "bg-amber-500/10 border-amber-500/30 text-amber-950 dark:text-amber-200",
+    container: "bg-system-orange/10 border-system-orange/20 text-label",
     icon: FiAlertTriangle,
-    iconColor: "text-amber-600 dark:text-amber-400",
+    iconColor: "text-system-orange",
   },
   info: {
-    container: "bg-blue-500/10 border-blue-500/30 text-blue-950 dark:text-blue-200",
+    container: "bg-system-blue/10 border-system-blue/20 text-label",
     icon: FiInfo,
-    iconColor: "text-blue-600 dark:text-blue-400",
+    iconColor: "text-system-blue",
   },
 };
 
@@ -54,21 +54,21 @@ export function Alert({
     <div
       role="alert"
       className={cn(
-        "flex w-full items-start gap-3.5 rounded-2xl border p-4 text-sm transition-all duration-200 shadow-sm",
+        "flex w-full items-start gap-3 rounded-apple-md border p-3.5 text-sm transition-all shadow-sm",
         style.container,
         className
       )}
     >
-      <IconComponent className={cn("mt-0.5 h-5 w-5 shrink-0 font-semibold", style.iconColor)} />
-      <div className="flex-1 space-y-1">
-        {title ? <h4 className="font-semibold leading-tight">{title}</h4> : null}
-        {children ? <div className="text-sm font-medium leading-relaxed opacity-95">{children}</div> : null}
+      <IconComponent className={cn("mt-0.5 h-4.5 w-4.5 shrink-0", style.iconColor)} />
+      <div className="flex-1 space-y-0.5">
+        {title ? <h4 className="font-semibold leading-tight text-label">{title}</h4> : null}
+        {children ? <div className="text-xs sm:text-sm text-label leading-relaxed">{children}</div> : null}
       </div>
       {dismissible || onClose ? (
         <button
           type="button"
           onClick={handleDismiss}
-          className="rounded-lg p-1 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+          className="rounded-apple-sm p-1 text-label-tertiary transition-colors hover:text-label hover:bg-black/5 dark:hover:bg-white/10"
           aria-label="Dismiss alert"
         >
           <FiX className="h-4 w-4" />

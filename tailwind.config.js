@@ -5,48 +5,88 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"SF Pro Text"',
+          '"SF Pro Display"',
+          '"SF Pro"',
+          "system-ui",
+          "-apple-system-font",
+          '"Helvetica Neue"',
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
+        mono: [
+          '"SF Mono"',
+          "SFMono-Regular",
+          "ui-monospace",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          "monospace",
+        ],
       },
       colors: {
         app: "var(--color-bg)",
         surface: "var(--color-surface)",
-        "surface-alt": "var(--color-surface-alt)",
-        text: "var(--color-text)",
-        muted: "var(--color-muted)",
-        border: "var(--color-border)",
-        primary: "var(--color-primary)",
-        secondary: "var(--color-secondary)",
-        accent: "var(--color-accent)",
-        success: "var(--color-success)",
-        danger: "var(--color-danger)",
+        "surface-secondary": "var(--color-surface-secondary)",
+        "surface-tertiary": "var(--color-surface-tertiary)",
+        separator: "var(--color-separator)",
+        "separator-opaque": "var(--color-separator-opaque)",
+        
+        /* Apple Label Hierarchy */
+        label: "var(--color-label-primary)",
+        "label-secondary": "var(--color-label-secondary)",
+        "label-tertiary": "var(--color-label-tertiary)",
+        "label-quaternary": "var(--color-label-quaternary)",
+
+        /* Apple System Accents */
+        "system-blue": "var(--color-system-blue)",
+        "system-green": "var(--color-system-green)",
+        "system-red": "var(--color-system-red)",
+        "system-orange": "var(--color-system-orange)",
+        "system-purple": "var(--color-system-purple)",
+        "system-teal": "var(--color-system-teal)",
+        "system-gray": "var(--color-system-gray)",
+
+        /* Backward-compatibility aliases */
+        primary: "var(--color-system-blue)",
+        secondary: "var(--color-system-gray)",
+        accent: "var(--color-system-purple)",
+        success: "var(--color-system-green)",
+        danger: "var(--color-system-red)",
+        text: "var(--color-label-primary)",
+        muted: "var(--color-label-secondary)",
+        border: "var(--color-separator)",
       },
       boxShadow: {
-        glow: "0 24px 60px rgba(37, 99, 235, 0.18)",
-        soft: "0 20px 50px rgba(15, 23, 42, 0.08)",
-        glass: "0 18px 45px rgba(15, 23, 42, 0.12)",
+        apple: "0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03)",
+        "apple-elevated": "0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)",
+        "apple-sheet": "0 -4px 24px rgba(0, 0, 0, 0.12)",
+        "apple-popover": "0 10px 30px rgba(0, 0, 0, 0.15)",
       },
       borderRadius: {
-        "4xl": "2rem",
-      },
-      backgroundImage: {
-        "grid-fade":
-          "linear-gradient(to right, rgba(148,163,184,0.14) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.14) 1px, transparent 1px)",
-        aurora:
-          "radial-gradient(circle at top left, rgba(37,99,235,0.18), transparent 34%), radial-gradient(circle at top right, rgba(124,58,237,0.16), transparent 28%), radial-gradient(circle at bottom, rgba(6,182,212,0.12), transparent 35%)",
-      },
-      keyframes: {
-        float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        pulseRing: {
-          "0%": { transform: "scale(0.95)", opacity: "0.55" },
-          "100%": { transform: "scale(1.15)", opacity: "0" },
-        },
+        "apple-sm": "8px",
+        "apple-md": "12px",
+        "apple-lg": "16px",
+        "apple-xl": "20px",
+        "apple-2xl": "24px",
       },
       animation: {
-        float: "float 6s ease-in-out infinite",
-        pulseRing: "pulseRing 2.5s ease-out infinite",
+        "fade-in": "fadeIn 0.2s ease-out forwards",
+        "scale-in": "scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        scaleIn: {
+          "0%": { opacity: "0", transform: "scale(0.96)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
       },
     },
   },

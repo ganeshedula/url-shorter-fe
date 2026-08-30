@@ -2,41 +2,49 @@ import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
-    <footer className="section-shell pb-10 pt-16">
-      <div className="glass-panel rounded-[32px] px-6 py-8 sm:px-8">
-        <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr_1fr]">
-          <div>
-            <h3 className="text-xl">Nexly</h3>
-            <p className="mt-3 max-w-md">
-              A premium URL shortener experience designed for teams that care about speed, clarity, and polished analytics.
+    <footer className="border-t border-separator bg-surface/40 pb-12 pt-10 text-xs text-label-secondary">
+      <div className="section-shell">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+          <div className="space-y-2">
+            <span className="text-sm font-semibold text-label">Nexly</span>
+            <p className="max-w-xs text-xs text-label-secondary leading-relaxed">
+              Designed for speed, clarity, and native feel across all devices.
             </p>
           </div>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted">Product</p>
-            <div className="mt-4 space-y-2 text-sm">
-              <a href="#features" className="block hover:text-text">
+            <p className="font-semibold text-label">Product</p>
+            <div className="mt-3 space-y-2">
+              <a href="#features" className="block hover:text-label transition-colors">
                 Features
               </a>
-              <a href="#pricing" className="block hover:text-text">
-                Pricing
+              <a href="#preview" className="block hover:text-label transition-colors">
+                Control Center
               </a>
-              <a href="#faq" className="block hover:text-text">
+              <a href="#faq" className="block hover:text-label transition-colors">
                 FAQ
               </a>
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-muted">Company</p>
-            <div className="mt-4 space-y-2 text-sm">
-              <a href="#about" className="block hover:text-text">
-                About
-              </a>
-              <Link to="/login" className="block hover:text-text">
-                Login
+            <p className="font-semibold text-label">Workspace</p>
+            <div className="mt-3 space-y-2">
+              <Link to="/login" className="block hover:text-label transition-colors">
+                Sign In
               </Link>
-              <Link to="/register" className="block hover:text-text">
-                Create account
+              <Link to="/register" className="block hover:text-label transition-colors">
+                Create Account
               </Link>
+              <Link to="/app/dashboard" className="block hover:text-label transition-colors">
+                Dashboard
+              </Link>
+            </div>
+          </div>
+          <div>
+            <p className="font-semibold text-label">Legal</p>
+            <div className="mt-3 space-y-2 text-label-tertiary">
+              <p>Privacy Policy</p>
+              <p>Terms of Service</p>
+              <p>© {new Date().getFullYear()} Nexly Inc.</p>
             </div>
           </div>
         </div>

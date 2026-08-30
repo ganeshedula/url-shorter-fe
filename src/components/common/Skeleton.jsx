@@ -1,5 +1,12 @@
 import { cn } from "../../utils/cn";
 
 export function Skeleton({ className }) {
-  return <div className={cn("animate-pulse rounded-2xl bg-slate-300/25 dark:bg-slate-700/40", className)} />;
+  return (
+    <div
+      className={cn(
+        "animate-pulse rounded-apple-md bg-surface-secondary/80 border border-separator/40",
+        className
+      )}
+    />
+  );
 }

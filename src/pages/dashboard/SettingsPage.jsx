@@ -9,14 +9,14 @@ import { usePageTitle } from "../../hooks/usePageTitle";
 import { formatDate } from "../../utils/formatters";
 
 export default function SettingsPage() {
-  usePageTitle("Settings");
+  usePageTitle("Settings — Nexly");
   const navigate = useNavigate();
   const { user, logoutAll } = useAuth();
 
   const handleLogoutAll = async () => {
     try {
       await logoutAll();
-      toast.success("All sessions ended.");
+      toast.success("All sessions terminated");
       navigate("/login");
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to log out all sessions.");
@@ -24,61 +24,69 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <Breadcrumb items={[{ label: "Workspace" }, { label: "Settings" }]} />
-      <div className="grid gap-4 xl:grid-cols-[1fr_0.9fr]">
-        <Card>
-          <h2 className="text-2xl">Profile</h2>
-          <p className="mt-2">The current backend exposes account retrieval but not profile mutation, so this section stays accurate and future-ready.</p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[24px] border border-border p-4">
-              <p className="text-sm font-semibold text-muted">Name</p>
-              <h3 className="mt-2 text-lg">{user?.username || "Not provided"}</h3>
-            </div>
-            <div className="rounded-[24px] border border-border p-4">
-              <p className="text-sm font-semibold text-muted">Email</p>
-              <h3 className="mt-2 text-lg">{user?.email}</h3>
-            </div>
-            <div className="rounded-[24px] border border-border p-4">
-              <p className="text-sm font-semibold text-muted">Role</p>
-              <h3 className="mt-2 text-lg">{user?.role}</h3>
-            </div>
-            <div className="rounded-[24px] border border-border p-4">
-              <p className="text-sm font-semibold text-muted">Joined</p>
-              <h3 className="mt-2 text-lg">{formatDate(user?.createdAt)}</h3>
-            </div>
+    <div className="space-y-5 max-w-3xl">
+      {/* Header */}
+      <div>
+        <Breadcrumb items={[{ label: "Workspace" }, { label: "Settings" }]} />
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-label">Settings</h1>
+      </div>
+
+      {/* Account Profile Group */}
+      <div className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-label-secondary px-1">
+          Account Profile
+        </h2>
+        <Card className="p-0 overflow-hidden divide-y divide-separator">
+          <div className="flex items-center justify-between p-4 text-xs sm:text-sm">
+            <span className="font-medium text-label-secondary">Username</span>
+            <span className="font-semibold text-label">{user?.username || "Not set"}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 text-xs sm:text-sm">
+            <span className="font-medium text-label-secondary">Email</span>
+            <span className="font-semibold text-label">{user?.email}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 text-xs sm:text-sm">
+            <span className="font-medium text-label-secondary">Role</span>
+            <span className="font-semibold text-label">{user?.role || "USER"}</span>
+          </div>
+          <div className="flex items-center justify-between p-4 text-xs sm:text-sm">
+            <span className="font-medium text-label-secondary">Member Since</span>
+            <span className="font-semibold text-label">{formatDate(user?.createdAt)}</span>
           </div>
         </Card>
+      </div>
 
-        <Card>
-          <h2 className="text-2xl">Preferences</h2>
-          <div className="mt-6 space-y-5">
-            <div className="flex items-center justify-between rounded-[24px] border border-border p-4">
-              <div>
-                <p className="font-semibold text-text">Theme mode</p>
-                <p className="mt-1 text-sm">Switch between light and dark surfaces.</p>
-              </div>
-              <ThemeToggle />
+      {/* Preferences Group */}
+      <div className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-label-secondary px-1">
+          Preferences
+        </h2>
+        <Card className="p-0 overflow-hidden divide-y divide-separator">
+          <div className="flex items-center justify-between p-4 text-xs sm:text-sm">
+            <div>
+              <p className="font-medium text-label">Appearance</p>
+              <p className="text-xs text-label-secondary mt-0.5">Toggle between light and dark mode</p>
             </div>
-
-            <div className="rounded-[24px] border border-border p-4">
-              <p className="font-semibold text-text">Profile updates</p>
-              <p className="mt-1 text-sm">
-                Update-name, change-email, and change-password panels are intentionally held until matching backend endpoints exist.
-              </p>
-              <Button variant="secondary" className="mt-4" onClick={() => toast("Profile update endpoints are not available yet.")}>
-                View planned actions
-              </Button>
-            </div>
-
-            <div className="rounded-[24px] border border-danger/25 bg-danger/5 p-4">
-              <p className="font-semibold text-text">Danger zone</p>
-              <p className="mt-1 text-sm">End every active session using the backend-supported logout-all endpoint.</p>
-              <Button variant="danger" className="mt-4" onClick={handleLogoutAll}>
-                Logout all sessions
-              </Button>
-            </div>
+            <ThemeToggle />
           </div>
+        </Card>
+      </div>
+
+      {/* Security & Sessions Group */}
+      <div className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-label-secondary px-1">
+          Security & Sessions
+        </h2>
+        <Card className="p-4 space-y-3 border-system-red/20 bg-system-red/5">
+          <div>
+            <p className="text-sm font-semibold text-label">Terminate All Sessions</p>
+            <p className="text-xs text-label-secondary mt-0.5">
+              Signs out of every device using your refresh token credentials.
+            </p>
+          </div>
+          <Button variant="destructive" size="sm" onClick={handleLogoutAll}>
+            Log out of all devices
+          </Button>
         </Card>
       </div>
     </div>
