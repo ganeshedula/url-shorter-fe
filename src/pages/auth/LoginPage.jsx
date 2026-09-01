@@ -28,6 +28,9 @@ export default function LoginPage() {
   const [isGoogleRedirecting, setIsGoogleRedirecting] = useState(false);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
 
+  // Success message passed from ResetPasswordPage after a successful password reset
+  const successMessage = location.state?.message;
+
   const {
     register,
     handleSubmit,
@@ -64,6 +67,12 @@ export default function LoginPage() {
             Use your Nexly account credentials to continue.
           </p>
         </div>
+
+        {successMessage && (
+          <div className="mb-4">
+            <Alert variant="success">{successMessage}</Alert>
+          </div>
+        )}
 
         {serverError && (
           <div className="mb-4">

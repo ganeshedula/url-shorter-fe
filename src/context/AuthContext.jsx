@@ -87,6 +87,17 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Called after email OTP verification. The backend returns a full auth payload
+   * (accessToken, refreshToken, user) so we can persist everything synchronously
+   * without an extra /me round-trip, guaranteeing isAuthenticated is true before
+   * the caller navigates to a protected route.
+   */
+  const completeEmailVerification = (authPayload) => {
+    persistAuth(authPayload);
+    toast.success("Email verified. Welcome!");
+  };
+
   const logout = async () => {
     const refreshToken = tokenStorage.getRefreshToken();
     try {
@@ -114,6 +125,7 @@ export function AuthProvider({ children }) {
       login,
       register,
       completeGoogleLogin,
+      completeEmailVerification,
       logout,
       logoutAll,
       refreshUser: hydrateUser,
