@@ -41,7 +41,8 @@ export default function RegisterPage() {
     setServerError("");
     try {
       await signUp(values);
-      navigate("/app/dashboard", { replace: true });
+      sessionStorage.setItem("nexly_verification_email", values.email.trim().toLowerCase());
+      navigate("/verify-email", { replace: true });
     } catch (error) {
       const errMsg = error.response?.data?.message || "Unable to create your account.";
       setServerError(errMsg);

@@ -61,8 +61,7 @@ export function AuthProvider({ children }) {
     setIsBusy(true);
     try {
       const response = await authService.register(values);
-      persistAuth(response.data);
-      toast.success("Account created successfully.");
+      toast.success("Verification code sent.");
       return response.data;
     } finally {
       setIsBusy(false);

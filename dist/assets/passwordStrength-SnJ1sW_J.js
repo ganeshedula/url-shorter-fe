@@ -1,0 +1,1 @@
+function r(e=""){let t=0;return e.length>=8&&(t+=1),/[A-Z]/.test(e)&&(t+=1),/[0-9]/.test(e)&&(t+=1),/[^A-Za-z0-9]/.test(e)&&(t+=1),t<=1?{label:"Weak",color:"bg-danger",width:"w-1/4"}:t===2?{label:"Fair",color:"bg-orange-400",width:"w-2/4"}:t===3?{label:"Strong",color:"bg-accent",width:"w-3/4"}:{label:"Excellent",color:"bg-success",width:"w-full"}}export{r as g};
