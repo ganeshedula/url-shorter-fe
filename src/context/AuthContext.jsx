@@ -69,6 +69,25 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const completeGoogleLogin = async ({ accessToken, refreshToken }) => {
+    if (!accessToken || !refreshToken) {
+      throw new Error("Google sign-in did not return a complete session.");
+    }
+    setIsBusy(true);
+    try {
+      tokenStorage.setTokens({ accessToken, refreshToken });
+      const response = await authService.me();
+      setUser(response.data);
+      toast.success("Signed in with Google.");
+    } catch (error) {
+      tokenStorage.clear();
+      setUser(null);
+      throw error;
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
   const logout = async () => {
     const refreshToken = tokenStorage.getRefreshToken();
     try {
@@ -95,6 +114,7 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user),
       login,
       register,
+      completeGoogleLogin,
       logout,
       logoutAll,
       refreshUser: hydrateUser,

@@ -1,1 +1,0 @@
-import{j as a,t as o,r as t}from"./index-DgLAEiYK.js";function p({className:r,children:e,...s}){return a.jsx("div",{className:o("rounded-apple-xl border border-separator bg-surface p-5 sm:p-6 shadow-apple transition-colors",r),...s,children:e})}function u(r){t.useEffect(()=>{document.title=r?`${r} | Nexly`:"Nexly URL Shortener"},[r])}export{p as C,u};

@@ -3,7 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FiArrowRight, FiLock, FiMail } from "react-icons/fi";
+import { FiArrowRight, FiLock, FiMail, FiLoader } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/common/Button";
@@ -24,6 +25,8 @@ export default function LoginPage() {
   const location = useLocation();
   const { login, isBusy } = useAuth();
   const [serverError, setServerError] = useState("");
+  const [isGoogleRedirecting, setIsGoogleRedirecting] = useState(false);
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
 
   const {
     register,
@@ -44,6 +47,12 @@ export default function LoginPage() {
       setServerError(errMsg);
       toast.error(errMsg);
     }
+  };
+
+  const startGoogleLogin = () => {
+    setServerError("");
+    setIsGoogleRedirecting(true);
+    window.location.assign(`${apiBaseUrl.replace(/\/$/, "")}/api/auth/google`);
   };
 
   return (
@@ -108,6 +117,23 @@ export default function LoginPage() {
               </>
             )}
           </Button>
+
+          <div className="relative py-1.5" aria-hidden="true">
+            <div className="border-t border-separator/70" />
+            <span className="absolute inset-x-0 -top-1.5 mx-auto w-fit bg-surface px-3 text-[11px] font-medium uppercase tracking-[0.14em] text-label-tertiary">
+              or
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={startGoogleLogin}
+            disabled={isBusy || isGoogleRedirecting}
+            className="flex h-11 w-full items-center justify-center gap-2 rounded-apple-md bg-surface text-sm font-semibold text-label shadow-apple-sm ring-1 ring-separator/70 transition-colors hover:bg-fill-secondary focus:outline-none focus:ring-2 focus:ring-system-blue/50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isGoogleRedirecting ? <FiLoader className="animate-spin" size={17} /> : <FcGoogle size={19} />}
+            {isGoogleRedirecting ? "Connecting…" : "Continue with Google"}
+          </button>
 
           <div className="pt-4 text-center text-xs text-label-secondary border-t border-separator/60">
             Don't have an account?{" "}
