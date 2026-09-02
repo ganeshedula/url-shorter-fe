@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FiArrowLeft, FiLock } from "react-icons/fi";
-import toast from "react-hot-toast";
 import { authService } from "../../services/authService";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
@@ -51,8 +50,8 @@ export default function ResetPasswordPage() {
       await authService.resetPassword({ email, resetToken, password });
       sessionStorage.removeItem("nexly_reset_email");
       sessionStorage.removeItem("nexly_reset_token");
-      // Show success toast BEFORE navigating so the user sees feedback
-      toast.success("Password updated successfully. Please sign in.");
+      // Use the platform alert so acknowledgement is required before returning to login.
+      window.alert("Password updated");
       navigate("/login", { replace: true });
     } catch (e) {
       setError(e.response?.data?.message || "Unable to reset your password.");

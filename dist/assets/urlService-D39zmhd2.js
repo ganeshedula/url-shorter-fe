@@ -1,0 +1,1 @@
+import{Z as t,_ as i}from"./index-C0wGJYn4.js";const p={create:async a=>t(await i.post("/api/url",a)),listMine:async a=>t(await i.get("/api/url/my",{params:a})),update:async(a,e)=>t(await i.put(`/api/url/${a}`,e)),remove:async a=>t(await i.delete(`/api/url/${a}`)),getAnalytics:async a=>t(await i.get(`/api/url/${a}`))};export{p as u};

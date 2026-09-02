@@ -23,6 +23,8 @@ export default function ForgotPasswordPage() {
   const submit = async ({ email }) => {
     setBusy(true); setError("");
     try {
+      // A previous reset authorization must never survive a new reset attempt.
+      sessionStorage.removeItem("nexly_reset_token");
       await authService.forgotPassword({ email });
       sessionStorage.setItem("nexly_reset_email", email.trim().toLowerCase());
       navigate("/verify-email?purpose=reset");
