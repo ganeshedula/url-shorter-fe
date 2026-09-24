@@ -4,12 +4,35 @@ import {
   FiCalendar,
   FiChevronLeft,
   FiChevronRight,
+  FiChevronUp,
+  FiChevronDown,
   FiClock,
   FiX,
   FiAlertCircle,
   FiCheck,
 } from "react-icons/fi";
+import toast from "react-hot-toast";
 import { cn } from "../../utils/cn";
+
+/** Returns true if the given datetime string is at least 1 full minute in the future */
+function isFutureDateTime(isoString) {
+  if (!isoString) return true;
+  const selected = new Date(isoString);
+  const now = new Date();
+  // Zero out seconds/ms for both to compare at minute granularity
+  now.setSeconds(0, 0);
+  selected.setSeconds(0, 0);
+  return selected.getTime() > now.getTime();
+}
+
+/** Returns true if the given calendar day is strictly before today */
+function isPastDay(year, month, day) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const check = new Date(year, month, day);
+  check.setHours(0, 0, 0, 0);
+  return check < today;
+}
 
 export function DateTimePicker({
   id,
@@ -110,7 +133,12 @@ export function DateTimePicker({
   };
 
   const handleDaySelect = (day) => {
+    if (isPastDay(viewYear, viewMonth, day)) return;
     const isoString = constructISOString(viewYear, viewMonth, day, hours12, minutes, ampm);
+    if (!isFutureDateTime(isoString)) {
+      toast.error("Expiration must be at least 1 minute in the future");
+      return;
+    }
     onChange(isoString);
   };
 
@@ -121,8 +149,36 @@ export function DateTimePicker({
     if (validDate) {
       const day = validDate.getDate();
       const isoString = constructISOString(viewYear, viewMonth, day, newH12, newMin, newAmpm);
+      if (!isFutureDateTime(isoString)) {
+        toast.error("Expiration must be at least 1 minute in the future");
+        return;
+      }
       onChange(isoString);
     }
+  };
+
+  const incrementHour = () => {
+    let h = parseInt(hours12, 10);
+    h = h >= 12 ? 1 : h + 1;
+    handleTimeChange(String(h).padStart(2, "0"), minutes, ampm);
+  };
+
+  const decrementHour = () => {
+    let h = parseInt(hours12, 10);
+    h = h <= 1 ? 12 : h - 1;
+    handleTimeChange(String(h).padStart(2, "0"), minutes, ampm);
+  };
+
+  const incrementMinute = () => {
+    let m = parseInt(minutes, 10);
+    m = m >= 59 ? 0 : m + 1;
+    handleTimeChange(hours12, String(m).padStart(2, "0"), ampm);
+  };
+
+  const decrementMinute = () => {
+    let m = parseInt(minutes, 10);
+    m = m <= 0 ? 59 : m - 1;
+    handleTimeChange(hours12, String(m).padStart(2, "0"), ampm);
   };
 
   const handleSetQuickPreset = (daysAhead) => {
@@ -166,13 +222,13 @@ export function DateTimePicker({
 
   const formattedDisplay = validDate
     ? validDate.toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
     : "";
 
   return (
@@ -192,8 +248,8 @@ export function DateTimePicker({
           error
             ? "border-system-red ring-1 ring-system-red/30 bg-system-red/5"
             : isOpen
-            ? "border-system-blue ring-2 ring-system-blue/20"
-            : "border-separator hover:border-separator-opaque"
+              ? "border-system-blue ring-2 ring-system-blue/20"
+              : "border-separator hover:border-separator-opaque"
         )}
       >
         <div className="flex items-center gap-2.5 overflow-hidden">
@@ -315,18 +371,23 @@ export function DateTimePicker({
                   new Date().getMonth() === viewMonth &&
                   new Date().getDate() === day;
 
+                const isPast = isPastDay(viewYear, viewMonth, day);
+
                 return (
                   <button
                     key={`day-${day}`}
                     type="button"
+                    disabled={isPast}
                     onClick={() => handleDaySelect(day)}
                     className={cn(
                       "flex h-8 w-8 mx-auto items-center justify-center rounded-full text-xs font-medium transition-all",
-                      isSelected
-                        ? "bg-system-blue text-white font-semibold shadow-sm"
-                        : isToday
-                        ? "text-system-blue font-bold hover:bg-surface-secondary"
-                        : "text-label hover:bg-surface-secondary active:scale-95"
+                      isPast
+                        ? "text-label-tertiary opacity-30 cursor-not-allowed"
+                        : isSelected
+                          ? "bg-system-blue text-white font-semibold shadow-sm"
+                          : isToday
+                            ? "text-system-blue font-bold hover:bg-surface-secondary"
+                            : "text-label hover:bg-surface-secondary active:scale-95"
                     )}
                   >
                     {day}
@@ -342,31 +403,48 @@ export function DateTimePicker({
                   <FiClock size={13} /> Time:
                 </span>
 
-                <div className="flex items-center gap-1">
-                  <select
-                    value={hours12}
-                    onChange={(e) => handleTimeChange(e.target.value, minutes, ampm)}
-                    className="rounded-apple-sm border border-separator bg-surface px-2 py-1 text-xs font-medium text-label focus:outline-none"
-                  >
-                    {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((h) => (
-                      <option key={h} value={h}>
-                        {h}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-label-tertiary">:</span>
-                  <select
-                    value={minutes}
-                    onChange={(e) => handleTimeChange(hours12, e.target.value, ampm)}
-                    className="rounded-apple-sm border border-separator bg-surface px-2 py-1 text-xs font-medium text-label focus:outline-none"
-                  >
-                    {["00", "15", "30", "45", "59"].map((m) => (
-                      <option key={m} value={m}>
-                        {m}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="flex rounded-apple-sm border border-separator p-0.5 bg-surface-secondary">
+                <div className="flex items-center gap-1.5">
+                  {/* Hours */}
+                  <div className="flex items-center rounded-apple-md border border-separator bg-surface overflow-hidden focus-within:ring-2 focus-within:ring-system-blue/20 focus-within:border-system-blue transition-all">
+                    <select
+                      value={hours12}
+                      onChange={(e) => handleTimeChange(e.target.value, minutes, ampm)}
+                      className="appearance-none bg-transparent px-2.5 py-1 text-sm font-semibold text-label focus:outline-none cursor-pointer hover:bg-surface-secondary transition-colors"
+                    >
+                      {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((h) => (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex flex-col border-l border-separator bg-surface-secondary h-full">
+                      <button type="button" onClick={incrementHour} className="px-1.5 py-[3px] text-label-tertiary hover:text-label hover:bg-surface-tertiary active:scale-95 transition-all"><FiChevronUp size={11} strokeWidth={3} /></button>
+                      <button type="button" onClick={decrementHour} className="px-1.5 py-[3px] text-label-tertiary hover:text-label hover:bg-surface-tertiary active:scale-95 transition-all border-t border-separator"><FiChevronDown size={11} strokeWidth={3} /></button>
+                    </div>
+                  </div>
+
+                  <span className="text-label-secondary font-bold mb-0.5">:</span>
+
+                  {/* Minutes */}
+                  <div className="flex items-center rounded-apple-md border border-separator bg-surface overflow-hidden focus-within:ring-2 focus-within:ring-system-blue/20 focus-within:border-system-blue transition-all">
+                    <select
+                      value={minutes}
+                      onChange={(e) => handleTimeChange(hours12, e.target.value, ampm)}
+                      className="appearance-none bg-transparent px-2.5 py-1 text-sm font-semibold text-label focus:outline-none cursor-pointer hover:bg-surface-secondary transition-colors"
+                    >
+                      {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex flex-col border-l border-separator bg-surface-secondary h-full">
+                      <button type="button" onClick={incrementMinute} className="px-1.5 py-[3px] text-label-tertiary hover:text-label hover:bg-surface-tertiary active:scale-95 transition-all"><FiChevronUp size={11} strokeWidth={3} /></button>
+                      <button type="button" onClick={decrementMinute} className="px-1.5 py-[3px] text-label-tertiary hover:text-label hover:bg-surface-tertiary active:scale-95 transition-all border-t border-separator"><FiChevronDown size={11} strokeWidth={3} /></button>
+                    </div>
+                  </div>
+
+                  <div className="flex rounded-apple-md border border-separator p-0.5 bg-surface-secondary ml-1.5">
                     {["AM", "PM"].map((period) => (
                       <button
                         key={period}
@@ -391,7 +469,13 @@ export function DateTimePicker({
             <div className="mt-3 pt-2.5 border-t border-separator flex justify-end">
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  if (value && !isFutureDateTime(value)) {
+                    toast.error("Expiration must be at least 1 minute in the future");
+                    return;
+                  }
+                  setIsOpen(false);
+                }}
                 className="inline-flex items-center gap-1 rounded-apple-md bg-system-blue px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 active:scale-95 transition-all"
               >
                 <FiCheck size={13} />

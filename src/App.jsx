@@ -23,6 +23,9 @@ const SettingsPage = lazy(() => import("./pages/dashboard/SettingsPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const ServerErrorPage = lazy(() => import("./pages/ServerErrorPage"));
 const OfflinePage = lazy(() => import("./pages/OfflinePage"));
+const UrlNotFoundPage = lazy(() => import("./pages/UrlNotFoundPage"));
+const UrlExpiredPage = lazy(() => import("./pages/UrlExpiredPage"));
+const InvalidUrlPage = lazy(() => import("./pages/InvalidUrlPage"));
 
 export default function App() {
   return (
@@ -58,6 +61,12 @@ export default function App() {
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
+
+            {/* Dedicated error pages for short URL failures */}
+            <Route path="/error/url-not-found" element={<UrlNotFoundPage />} />
+            <Route path="/error/url-expired" element={<UrlExpiredPage />} />
+            <Route path="/error/invalid-url" element={<InvalidUrlPage />} />
+            <Route path="/error/server-error" element={<ServerErrorPage />} />
 
             <Route path="/500" element={<ServerErrorPage />} />
             <Route path="/offline" element={<OfflinePage />} />

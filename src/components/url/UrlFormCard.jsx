@@ -44,6 +44,17 @@ export function UrlFormCard({ onSubmit, initialValues, mode = "create", loading 
   }, [initialValues?.url, initialValues?.expirationDate, reset]);
 
   const submit = async (values) => {
+    if (values.expirationDate) {
+      const selected = new Date(values.expirationDate);
+      const now = new Date();
+      now.setSeconds(0, 0);
+      selected.setSeconds(0, 0);
+      if (selected.getTime() <= now.getTime()) {
+        toast.error("Expiration must be at least 1 minute in the future");
+        return;
+      }
+    }
+
     const payload = {
       url: values.url,
       expirationDate: values.expirationDate
