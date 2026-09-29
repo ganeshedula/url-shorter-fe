@@ -1,9 +1,16 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export function Footer() {
   return (
-    <footer className="border-t border-separator bg-surface/40 pb-12 pt-10 text-xs text-label-secondary">
-      <div className="section-shell">
+    <footer className="border-t border-separator bg-surface/40 pb-12 pt-10 text-xs text-label-secondary overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="section-shell"
+      >
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
           <div className="space-y-2">
             <span className="text-sm font-semibold text-label">Nexly</span>
@@ -48,7 +55,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 }
